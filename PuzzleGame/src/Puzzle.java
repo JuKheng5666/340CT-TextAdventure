@@ -28,6 +28,15 @@ public class Puzzle extends JPanel {
 	public boolean started = false;
 	public boolean mixing = false;
 	
+	/* state for checking whether timer is paused or not
+	 * if puzzle paused, state = false,
+	 * if puzzle not paused, state = true
+	 * */
+	public static boolean state = true;
+	
+	//variable for checking whether puzzle is completed
+	public static boolean complete = false;
+
 	/*
 	 * Parameterize methods
 	 * Pass in variable is the img 
@@ -47,6 +56,15 @@ public class Puzzle extends JPanel {
 		}
 	}
 	
+	public void setState(boolean s){
+		state = s;
+	}
+	
+	//check if puzzle is completed.. not used at all
+	public boolean isComplete(){
+		return complete;
+	}
+	
 	/*
 	 * start method 
 	 * when the segment 9 on the bottom right is empty the mix will start 
@@ -56,7 +74,10 @@ public class Puzzle extends JPanel {
 		started = true;
 		//remove segment 9 (the one in the bottom right)
 		segments[8].isEmpty = true;
-		mix.start();
+		
+		//if puzzle is already completed, dont allow to mix again
+		if (complete == false)
+			mix.start();
 	}
 	
 	
@@ -131,34 +152,38 @@ public class Puzzle extends JPanel {
 	
 	//Check if the user clicked onto a seg,emt amd of possible move it onto the empty one
 	public void onClick(MouseEvent e) {
-		for (Segment s : segments) {
-			if (s.hitten(e.getPoint())) {
-				Point tmp = s.getPosition();
-				if (s.move(segments[8].getPosition())) {
-					segments[8].setPosition(tmp);
-					
-					boolean done = true;
-					for (int i = 0; i != 9; i++) {
-						if (segments[i].getPosition().x == ((i <= 2)? i:(i <= 5)? (i-3):(i-6)) && segments[i].getPosition().y == (int) Math.ceil((i/3))) {
-							System.out.println(i+": :)");
-						} else {
-							System.out.println(i+": :(");
-							done = false;
+		//if puzzle is not paused and is not completed yet, allow onClick events
+		if (state != false && complete == false){
+			for (Segment s : segments) {
+				if (s.hitten(e.getPoint())) {
+					Point tmp = s.getPosition();
+					if (s.move(segments[8].getPosition())) {
+						segments[8].setPosition(tmp);
+						
+						boolean done = true;
+						for (int i = 0; i != 9; i++) {
+							if (segments[i].getPosition().x == ((i <= 2)? i:(i <= 5)? (i-3):(i-6)) && segments[i].getPosition().y == (int) Math.ceil((i/3))) {
+								System.out.println(i+": :)");
+							} else {
+								System.out.println(i+": :(");
+								done = false;
+							}
 						}
-					}
-					
-					if (done) {
-						started = false;
-						segments[8].isEmpty = false;
+						
+						//what happens when puzzle is completed
+						if (done) {
+							started = false;
+							segments[8].isEmpty = false;
+							complete = true;
+						}
 					}
 				}
 			}
+			repaint(); 
+			//schedule component for redrawing 
+			//control the update()to paint() cycle
+			//repaint can't be override
 		}
-		repaint(); 
-		//schedule component for redrawing 
-		//control the update()to paint() cycle
-		//repaint can't be override
-		
 	}
 	
 	/*
