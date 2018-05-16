@@ -5,19 +5,21 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+//Main class 
 public class Main {
 	
 	JFrame window;
 	Container con;
 	JPanel titleNamePanel, startButtonPanel, mainTextPanel, choiceButtonPanel, playerPanel;
 	JLabel titleNameLabel, hpLabel, hpLabelNumber, weaponLabel, weaponLabelName;
-	Font titleFont = new Font("Times New Roman", Font.PLAIN, 90);
+	Font titleFont = new Font("Times New Roman", Font.PLAIN, 70);
 	Font normalFont = new Font("Times New Roman", Font.PLAIN, 28);
 	JButton startButton, choice1, choice2, choice3, choice4;
 	JTextArea mainTextArea;
@@ -29,7 +31,8 @@ public class Main {
 
 
 	public static void main(String[] args) {
-
+		
+		//run the default main
 		new Main();
 	}
 	
@@ -38,25 +41,26 @@ public class Main {
 		window = new JFrame();
 		window.setSize(800, 600);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.getContentPane().setBackground(Color.black);
-		window.setLayout(null);
+		window.setContentPane(new JLabel(new ImageIcon(Main.class.getResource("jungle.jpg"))));
+		//window.getContentPane().setBackground(Color.black);
+		//window.setLayout(null);
 	
 		con = window.getContentPane();
 		
 		titleNamePanel = new JPanel();
 		titleNamePanel.setBounds(100, 100, 600, 150);
-		titleNamePanel.setBackground(Color.black);
-		titleNameLabel = new JLabel("ADVENTURE");
+		titleNamePanel.setBackground(new Color(0,0,0,30));
+		titleNameLabel = new JLabel("Science Exploration");
 		titleNameLabel.setForeground(Color.white);
 		titleNameLabel.setFont(titleFont);	
 		
 		startButtonPanel = new JPanel();
 		startButtonPanel.setBounds(300, 400, 200, 100);
-		startButtonPanel.setBackground(Color.black);
+		startButtonPanel.setBackground(new Color(0,0,0,0));
 		
-		startButton = new JButton("START");
-		startButton.setBackground(Color.black);
-		startButton.setForeground(Color.white);
+		startButton = new JButton("Begin");
+		//startButton.setBackground(Color.black);
+		//startButton.setForeground(Color.white);
 		startButton.setFont(normalFont);
 		startButton.addActionListener(tsHandler);
 		startButton.setFocusPainted(false);
@@ -67,9 +71,11 @@ public class Main {
 		con.add(titleNamePanel);
 		con.add(startButtonPanel);
 		
+		//The display is set to true so player can see the title and begin button
 		window.setVisible(true);
 	}
 	
+	//set up the game screen 
 	public void createGameScreen(){
 		
 		titleNamePanel.setVisible(false);
@@ -94,6 +100,7 @@ public class Main {
 		choiceButtonPanel.setLayout(new GridLayout(4,1));
 		con.add(choiceButtonPanel);
 		
+		//Design button one - Choice 1
 		choice1 = new JButton("Choice 1");
 		choice1.setBackground(Color.black);
 		choice1.setForeground(Color.white);
@@ -102,6 +109,8 @@ public class Main {
 		choice1.addActionListener(choiceHandler);
 		choice1.setActionCommand("c1");
 		choiceButtonPanel.add(choice1);
+		
+		//Design button two -Choice 2
 		choice2 = new JButton("Choice 2");
 		choice2.setBackground(Color.black);
 		choice2.setForeground(Color.white);
@@ -110,6 +119,8 @@ public class Main {
 		choice2.addActionListener(choiceHandler);
 		choice2.setActionCommand("c2");
 		choiceButtonPanel.add(choice2);
+		
+		//Design button three -Choice 3
 		choice3 = new JButton("Choice 3");
 		choice3.setBackground(Color.black);
 		choice3.setForeground(Color.white);
@@ -118,6 +129,8 @@ public class Main {
 		choice3.addActionListener(choiceHandler);
 		choice3.setActionCommand("c3");
 		choiceButtonPanel.add(choice3);
+		
+		//Design button four -Choice 4
 		choice4 = new JButton("Choice 4");
 		choice4.setBackground(Color.black);
 		choice4.setForeground(Color.white);
@@ -127,176 +140,232 @@ public class Main {
 		choice4.setActionCommand("c4");
 		choiceButtonPanel.add(choice4);
 		
+		//Design the screen background
 		playerPanel = new JPanel();
 		playerPanel.setBounds(100, 15, 600, 50);
 		playerPanel.setBackground(Color.black);
 		playerPanel.setLayout(new GridLayout(1,4));
 		con.add(playerPanel);
+		
+		//Design the Power label display on screen 
 		hpLabel = new JLabel("HP:");
 		hpLabel.setFont(normalFont);
 		hpLabel.setForeground(Color.white);
 		playerPanel.add(hpLabel);
+		
+		//Design the Power count display on screen 
 		hpLabelNumber = new JLabel();
 		hpLabelNumber.setFont(normalFont);
 		hpLabelNumber.setForeground(Color.white);
 		playerPanel.add(hpLabelNumber);
+		
+		//Design the Weapon label display on screen
 		weaponLabel = new JLabel("Weapon:");
 		weaponLabel.setFont(normalFont);
 		weaponLabel.setForeground(Color.white);
 		playerPanel.add(weaponLabel);
+		
+		//Design the Weapon type display on screen
 		weaponLabelName = new JLabel();
 		weaponLabelName.setFont(normalFont);
 		weaponLabelName.setForeground(Color.white);
 		playerPanel.add(weaponLabelName);
 
+		//go to playerSetup
 		playerSetup();
 
 	}
+	
 	public void playerSetup(){
+		
+		//initialize variables
 		playerHP = 15;
 		monsterHP = 20;
 		weapon = "Knife";
 		weaponLabelName.setText(weapon);
 		hpLabelNumber.setText("" + playerHP);
 		
-		townGate();
+		//go to townGate
+		//itemDamage();
+		wildAnimal();
 	}
-	public void townGate(){
-		position = "townGate";
-		mainTextArea.setText("You are at the gate of the town. \nA guard is standing in front of you. \n\nWhat do you do?");		
-		choice1.setText("Talk to the guard");
-		choice2.setText("Attack the guard");
-		choice3.setText("Leave");
+	
+	public void itemDamage(){
+		position="itemDamage";
+		
+		mainTextArea.setText("You have a treasure map that leads to ancient relic. \nYou are now at the entrance of amzaon jungle \n\nUnfortunately your bag damage.");		
+		
+	}
+	
+	public void wildAnimal(){
+		position="wildAnimal";
+		mainTextArea.setText("You have a treasure map that leads to ancient relic. \nYou are now at the entrance of amzaon jungle \n\nYou heard a nearby bush rustle.\nYou panic and you start to run.\n\n Which wild animal you think it will be?");		
+		choice1.setText("Snake");
+		choice2.setText("Tiger");
+		choice3.setText("Monkey");
 		choice4.setText("");
 	}
-	public void talkGuard(){
-		position = "talkGuard";
-		mainTextArea.setText("Guard: Hello stranger. I have never seen your face. \nI'm sorry but we cannot let a stranger enter our town.");
-		choice1.setText(">");
+	
+	public void Monkey(){
+		position="monkey";
+		mainTextArea.setText("Your guess is a monkey.Click next to solve a puzzle to continue your journey.");
+		choice1.setText(">"); // puzzle console
 		choice2.setText("");
 		choice3.setText("");
 		choice4.setText("");
 	}
-	public void attackGuard(){
-		position = "attackGuard";
-		mainTextArea.setText("Guard: Hey don't be stupid!\n\nThe guard fought back and hit you hard.\n(You receive 3 damage)");
-		playerHP = playerHP -3;
-		hpLabelNumber.setText(""+playerHP);
-		choice1.setText(">");
+	
+	public void Snake(){
+		position= "snake";
+		mainTextArea.setText("Your guess is a snake.Click next to solve a puzzle to continue your journey.");
+		choice1.setText(">");// puzzle console
 		choice2.setText("");
 		choice3.setText("");
 		choice4.setText("");
 	}
+	
+	public void Tiger(){
+		position="tiger";
+		mainTextArea.setText("Your guess is a tiger.Click next to solve a puzzle to continue your journey.");
+		choice1.setText(">");// puzzle console
+		choice2.setText("");
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	
 	public void crossRoad(){
 		position = "crossRoad";
-		mainTextArea.setText("You are at a crossroad.\nIf you go south, you will go back to the town.");
+		mainTextArea.setText("You take a look behind you.\n\n Sadly, it was just a wild rabbit and you ran away like a little girl.\n\nYou are now lost.\nChoose where you want to go");
 		choice1.setText("Go north");
 		choice2.setText("Go east");
-		choice3.setText("Go south");
-		choice4.setText("Go west");
+		choice3.setText("Go west");
 	}
+	
+	//choice:Go north 
+	//will come to north method
+	//
 	public void north(){
 		position = "north";
-		mainTextArea.setText("There is a river. \nYou drink the water and rest at the riverside. \n\n(Your HP is recovered by 2)");
-		playerHP = playerHP + 2;
-		hpLabelNumber.setText(""+playerHP);
-		choice1.setText("Go south");
+		mainTextArea.setText("You head back to where you begin.\n\n Game repeated.");
+		choice1.setText(">");
 		choice2.setText("");
 		choice3.setText("");
-		choice4.setText("");		
+		choice4.setText("");
 	}
+	
+	//choice:Go east
+	//will come to east method
 	public void east(){
 		position = "east";
-		mainTextArea.setText("You walked into a forest and found a Long Sword!\n\n(You obtained a Long Sword)");
+		mainTextArea.setText("There is nothing here.Go back");
+		/*
 		weapon = "Long Sword";
 		weaponLabelName.setText(weapon);
-		choice1.setText("Go west");
+		*/
+		choice1.setText("Go back");
 		choice2.setText("");
 		choice3.setText("");
 		choice4.setText("");
 		
 	}
+	
+	//choice:Go west
+	//will come to west method
 	public void west(){
 		position = "west";
-		mainTextArea.setText("You encounter a goblin!");
-		choice1.setText("Fight");
-		choice2.setText("Run");
+		mainTextArea.setText("As you walk, a monkey jump to you and snatch your hat.\n\nWhat you going to do?");
+		
+		choice1.setText("Just let it be");
+		choice2.setText("Chase the monkey");
 		choice3.setText("");
 		choice4.setText("");
 	}
-	public void fight(){
-		position = "fight";
-		mainTextArea.setText("Monter HP: " + monsterHP + "\n\nWhat do you do?");
-		choice1.setText("Attack");
-		choice2.setText("Run");
+	
+	
+	public void chaseMonkey(){
+		position ="chasemonkey";
+		mainTextArea.setText("The monkey ran away.\n\n You gave up chasing it.\n\n You are thinking what to do next.");
+		choice1.setText("Find some fruits to eat."); //Another puzzle game
+		choice2.setText("Find a way out"); //discover secret code that may helpful later on
+		choice3.setText("Just sit and relax");// wake up and player is in the temple
+		choice4.setText("");
+	}
+	
+	public void ruinTemple(){
+		position = "ruintemple";
+		mainTextArea.setText("As you are thinking a way out.\n You discover a ruin temple.\n\n So you take your chance to discover more.");
+		choice1.setText("Discover the temple");//will get secret code
+		choice2.setText("");
 		choice3.setText("");
 		choice4.setText("");
 	}
-	public void playerAttack(){
-		position = "playerAttack";
-		
-		int playerDamage = 0;
-		
-		if(weapon.equals("Knife")){
-			playerDamage = new java.util.Random().nextInt(3);
-		}
-		else if(weapon.equals("Long Sword")){
-			playerDamage = new java.util.Random().nextInt(12); 
-		}
-		
-		mainTextArea.setText("You attacked the monster and gave " + playerDamage + " damage!");
-		
-		monsterHP = monsterHP - playerDamage;
-		
-		choice1.setText(">");
-		choice2.setText("");
-		choice3.setText("");
-		choice4.setText("");		
-	}
-	public void monsterAttack(){
-		position = "monsterAttack";
-		
-		int monsterDamage = 0;
-		
-		monsterDamage = new java.util.Random().nextInt(6); 
-		
-		mainTextArea.setText("The monster attacked you and gave " + monsterDamage + " damage!");
-		
-		playerHP = playerHP - monsterDamage;
-		hpLabelNumber.setText(""+playerHP);
-		
-		choice1.setText(">");
-		choice2.setText("");
-		choice3.setText("");
-		choice4.setText("");	
-	}
-	public void win(){
-		position = "win";
-		
-		mainTextArea.setText("You defeated the monster!\nThe monster dropped a ring!\n\n(You obtained a Silver Ring)");
-		
-		silverRing = 1;
-		
-		choice1.setText("Go east");
-		choice2.setText("");
+	
+	public void findFruit(){
+		position="findfruit";
+		mainTextArea.setText("You walk for a long time and you feel the thirst burns your throat and the sun is so hot.You are hungry and exhausted.\n\n You trip and fall onto a stone. You cry in pain and found out it is a code wait to be solve.");//will discover secret code
+		choice1.setText("Solve the code");//will get secret code// here is the scramble puzzle take place
+		choice2.setText("Walk away");// will end up aWayOut
 		choice3.setText("");
 		choice4.setText("");
 		
 	}
-	public void lose(){
-		position = "lose";
-		
-		mainTextArea.setText("You are dead!\n\n");
-		
-		choice1.setText("");
+	
+	public void aWayOut(){
+		position="awayout";
+		mainTextArea.setText("A parrot sang a song to you.\nIt said if you know what is the song it is singing.It will give you the secret code.");//will discover secret code
+		choice1.setText("Accept its challenge.");//will get secret code// here is the scramble puzzle take place
+		choice2.setText("Walk away");// will end up in the temple
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void sitAndRelax(){
+		position="sitandrelax";//end up in temple
+		mainTextArea.setText("You sat down and relax.\n\n You just want to go home.\n\n Something hit you hard and you pass out.");
+		choice1.setText(">");// wakeUp()
 		choice2.setText("");
 		choice3.setText("");
 		choice4.setText("");
-		choice1.setVisible(false);
-		choice2.setVisible(false);
-		choice3.setVisible(false);
-		choice4.setVisible(false);
 	}
+	
+	public void wakeUp(){
+		position="wakeup";
+		mainTextArea.setText("Your head are so painful when you woke up.\nYou tried to remember what happened.\n Later you found yourself in a ruin temple.");
+		choice1.setText(">");// discovertemple()
+		choice2.setText("");
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void discoverTemple(){
+		position ="discovertemple";
+		mainTextArea.setText("You look around and there is two tunnels.Which tunnel should you go?");
+		choice1.setText("Left tunnel"); //Step on floor and arrows comes out 
+		choice2.setText("Right tunnel"); //To be continue 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void leftTunnel(){
+		//Step on the floor and arrows come out
+		//Left and Right point counts (maybe later)
+	}
+	
+	public void rightTunnel(){
+		//Wall closing 
+	}
+	public void codeSolve(){
+		position="codesolve";
+		mainTextArea.setText("You get the secret numbers.\n\nRemember the number, it might help you later on.");
+		choice1.setText(">"); //For findFruit() and awayout - Accept challenge will have different outcomes
+		choice2.setText("");  
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	
+	//story end
 	public void ending(){
 		position = "ending";
 		
@@ -311,7 +380,9 @@ public class Main {
 		choice3.setVisible(false);
 		choice4.setVisible(false);
 	}
-
+	
+	//handle the screen 
+	//createGameScreen method is called
 	public class TitleScreenHandler implements ActionListener{
 		
 		public void actionPerformed(ActionEvent event){
@@ -319,6 +390,9 @@ public class Main {
 			createGameScreen();
 		}
 	}
+	
+	//the choice handle handle the choice using use case 
+	
 	public class ChoiceHandler implements ActionListener{
 		
 		public void actionPerformed(ActionEvent event){
@@ -326,96 +400,162 @@ public class Main {
 			String yourChoice = event.getActionCommand();
 			
 			switch(position){
-			case "townGate":
-				switch(yourChoice){
-				case "c1": 
-					if(silverRing==1){
-						ending();
+				
+				case "crossRoad":
+					switch(yourChoice){
+						case "c1": north(); break;
+						case "c2": east();break;
+						case "c3": west();break;
 					}
-					else{
-						talkGuard();
+					
+				break;
+				
+				case "north":
+					switch(yourChoice){
+						case "c1": wildAnimal(); break;
 					}
-					break;
-				case "c2": attackGuard();break;
-				case "c3": crossRoad();break;
-				}
 				break;
-			case "talkGuard":
-				switch(yourChoice){
-				case "c1": townGate(); break;
-				}
-				break;
-			case "attackGuard":
-				switch(yourChoice){
-				case "c1": townGate(); break;
-				}
-				break;
-			case "crossRoad":
-				switch(yourChoice){
-				case "c1": north(); break;
-				case "c2": east();break;
-				case "c3": townGate(); break;
-				case "c4": west();break;
-				}
-				break;
-			case "north":
-				switch(yourChoice){
-				case "c1": crossRoad(); break;
-				}
-				break;
-			case "east":
-				switch(yourChoice){
-				case "c1": crossRoad(); break;
-				}
-				break;
-			case "west":
-				switch(yourChoice){
-				case "c1": fight(); break;
-				case "c2": crossRoad(); break;
-				}
-				break;
-			case "fight":
-				switch(yourChoice){
-				case "c1": playerAttack();break;
-				case "c2": crossRoad(); break;
-				}
-				break;
-			case "playerAttack":
-				switch(yourChoice){
-				case "c1": 
-					if(monsterHP<1){
-						win();
+				
+				case "east":
+					switch(yourChoice){
+						case "c1": crossRoad(); break;
 					}
-					else{
-						monsterAttack();
-					}
-					break;
-				}
 				break;
-			case "monsterAttack":
-				switch(yourChoice){
-				case "c1": 
-					if(playerHP<1){
-						lose();
-					}
-					else{
-						fight();
-					}
-					break;
-				}
-				break;
-			case "win":
-				switch(yourChoice){
-				case "c1": crossRoad();
+				
+				case "west":
+					switch(yourChoice){
+						case "c1": ruinTemple(); break;
+						case "c2": chaseMonkey(); break;
 				}
 				break;
 				
-			}
+			case "wildAnimal":
+				switch(yourChoice){
+					case "c1":
+						Snake();
+						//switch(yourChoice){case "c1":townGate();}
+						break;
+					
+					case "c2":
+						Tiger();
+						//switch(yourChoice){case "c1":townGate();}
+						break;
+						
+					case "c3":
+						Monkey();
+						//switch(yourChoice){case "c1":townGate();}
+						break;
+					
+				}
+			case "snake":
+				switch(yourChoice){
+					case "c1": crossRoad(); break;
+				}
+			break;
+			
+			case "tiger":
+				switch(yourChoice){
+					case "c1": crossRoad(); break;
+				}
+			break;
+				
+			case "monkey":
+				switch(yourChoice){
+					case "c1": crossRoad(); break;
+				}
+			break;
+			
+			case "chasemonkey":
+				switch(yourChoice){
+				case "c1":
+					findFruit();
+					break;
+					
+				case "c2":
+					aWayOut();
+					break;
+				
+				case "c3":
+					sitAndRelax();
+					break;
+				}
+				break; 
+				
+				
+			case "findfruit":
+				switch(yourChoice){
+				case "c1":
+					codeSolve();
+					break;
+					
+				case "c2":
+					aWayOut();
+					break;
+				
+				}
+				
+				break;
+			
+			case "awayout":
+				switch(yourChoice){
+				case "c1":
+					codeSolve();
+					break;
+					
+				case "c2":
+					sitAndRelax();
+					break;
+				
+				}
+				
+				break;
+			
+			case "sitandrelax":
+				switch(yourChoice){
+				case "c1":
+					wakeUp();
+					break;
+				
+				}
+				
+				break;	
+				
+				
+			case "wakeup":
+				switch(yourChoice){
+				case "c1":
+					discoverTemple();
+					break;
+				}
+				
+				break;	
+			//here	
+			case "discovertenple":
+				switch(yourChoice){
+				case "c1":
+					leftTunnel();
+					break;
+					
+				case "c2":
+					rightTunnel();
+					break;
+				}
+				
+				break;	
+				
+				
+			case "codesolve":
+				switch(yourChoice){
+				case "c1":
+					//WILL ADD IN LATER
+					break;
+				}
+			}//endSwitch
 			
 			
-		}
-	}
+		}//endActionPerformed
+	}//endChoiceHandler
 
 
 
-}
+}//endMain
