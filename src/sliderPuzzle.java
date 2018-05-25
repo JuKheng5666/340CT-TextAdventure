@@ -269,4 +269,8 @@ public class sliderPuzzle {
 			}
 		});
 	}
+	
+	public String getUserProgress(){
+		return puzzle.getUserProgress();
+	}
 }

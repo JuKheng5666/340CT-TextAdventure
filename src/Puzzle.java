@@ -36,6 +36,7 @@ public class Puzzle extends JPanel {
 	
 	//variable for checking whether puzzle is completed
 	public static boolean complete = false;
+	public static String userProgress = "progress";
 	/*
 	 * Parameterize methods
 	 * Pass in variable is the img 
@@ -55,12 +56,6 @@ public class Puzzle extends JPanel {
 		}
 	}
 	
-	public void resetPuzzle(){
-		started = false;
-		mixing = false;
-		complete = false;
-	}
-	
 	public void setState(boolean s){
 		state = s;
 	}
@@ -70,6 +65,13 @@ public class Puzzle extends JPanel {
 		return complete;
 	}
 	
+	public void setUserProgress(String p){
+		userProgress = p;
+	}
+	
+	public String getUserProgress(){
+		return userProgress;
+	}
 	/*
 	 * start method 
 	 * when the segment 9 on the bottom right is empty the mix will start 
