@@ -1,5 +1,8 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -16,25 +19,32 @@ import javax.swing.JTextArea;
 //Main class 
 public class Main {
 
-	JFrame window;
-	Container con;
+	//main text adventure
+	JFrame window, knowledgeWindow;
+	Container con, con2;
 	JPanel titleNamePanel, startButtonPanel, mainTextPanel, choiceButtonPanel, playerPanel;
-	JLabel titleNameLabel, hpLabel, hpLabelNumber, weaponLabel, weaponLabelName;
+	JLabel titleNameLabel, hpLabel, hpLabelNumber, weaponLabel, weaponLabelName, background, knowledgeBackground;
 	Font titleFont = new Font("Times New Roman", Font.PLAIN, 70);
 	Font normalFont = new Font("Times New Roman", Font.PLAIN, 28);
 	JButton startButton, choice1, choice2, choice3, choice4;
 	JTextArea mainTextArea;
+
 	int playerHP, monsterHP, silverRing;
-	String weapon, position;
+	volatile 
+	boolean puzzleSuccess = false;
+	volatile boolean scramblerSuccess;
+	boolean lastPuzzle = false;
+
+	String weapon, position, prevPosition, knowledgeDisplayTxt;
 	Color semiTransparent = new Color(0,0,0,30);
 
 	TitleScreenHandler tsHandler = new TitleScreenHandler();
 	ChoiceHandler choiceHandler = new ChoiceHandler();
 
-	static String puzzleComplete = "";
+	PuzzleGame.Main puzzleGame =  new PuzzleGame.Main();
+	WordScrambler.UIMain wordScrambler = new WordScrambler.UIMain();
 
 	public static void main(String[] args) {
-
 		//run the default main
 		new Main();
 	}
@@ -44,7 +54,13 @@ public class Main {
 		window = new JFrame();
 		window.setSize(800, 600);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setContentPane(new JLabel(new ImageIcon(Main.class.getResource("jungle.jpg"))));
+
+		background = new JLabel(new ImageIcon(Main.class.getResource("/Images/jungle.jpg")));
+		window.setContentPane(background);
+
+		window.setResizable(false);
+		window.pack();
+		window.setLocationRelativeTo(null);
 		//window.getContentPane().setBackground(Color.black);
 		//window.setLayout(null);
 
@@ -62,8 +78,6 @@ public class Main {
 		startButtonPanel.setBackground(new Color(0,0,0,0));
 
 		startButton = new JButton("Begin");
-		//startButton.setBackground(Color.black);
-		//startButton.setForeground(Color.white);
 		startButton.setFont(normalFont);
 		startButton.addActionListener(tsHandler);
 		startButton.setFocusPainted(false);
@@ -90,11 +104,16 @@ public class Main {
 		con.add(mainTextPanel);
 
 		mainTextArea = new JTextArea("This is the main text are. This game is going to be great. I'm sure of it!!!!!!!");
+		mainTextArea.setHighlighter(null);
+		mainTextArea.setEditable(false);
 		mainTextArea.setBounds(100, 100, 600, 250);
 		mainTextArea.setBackground(semiTransparent);
 		mainTextArea.setForeground(Color.white);
 		mainTextArea.setFont(normalFont);
 		mainTextArea.setLineWrap(true);
+		mainTextArea.setWrapStyleWord(true);
+		mainTextArea.getCaret().deinstall(mainTextArea);
+
 		mainTextPanel.add(mainTextArea);
 
 		choiceButtonPanel = new JPanel();
@@ -197,38 +216,79 @@ public class Main {
 		position="itemDamage";
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("You have a treasure map that leads to ancient relic. \nYou are now at the entrance of amzaon jungle \n\nUnfortunately your bag damage.");		
+		mainTextArea.setText("You have a treasure map that leads to ancient relic. \nYou are now at the entrance of amazon jungle \n\nUnfortunately your bag damage.");		
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
 	}
+	
+	public void knowledgeBank(){
+		//position = "knowledge";
+		
+		knowledgeWindow = new JFrame("Science Exploration Knowledge Bank");
+		knowledgeWindow.setSize(800, 600);
+		//Dimension preferSize = new Dimension(800, 600);
+				
+		//knowledgeBackground = new JLabel(new ImageIcon(Main.class.getResource("/Images/jungle.jpg")));
+		//knowledgeWindow.setContentPane(knowledgeBackground);
+		
+		//knowledgeWindow.setPreferredSize(preferSize);
+		knowledgeWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		knowledgeWindow.setResizable(true);
+		knowledgeWindow.setLocationRelativeTo(null);
+		
+		JPanel mainPanel = new KnowledgeBank(position);
+		knowledgeWindow.getContentPane().add(mainPanel);
+		
+		System.out.println("AHHHHHH");
+		
+		knowledgeWindow.revalidate();
+		knowledgeWindow.repaint();
+		knowledgeWindow.pack();
+		
+		System.out.println("ROCK AND ROLL");
+		
+		knowledgeWindow.setVisible(true);		
+	}
 
 	public void wildAnimal(){
 		position="wildAnimal";
-		mainTextArea.setText("You have a treasure map that leads to ancient relic. \nYou are now at the entrance of amzaon jungle \n\nYou heard a nearby bush rustle.\nYou panic and you start to run.\n\n Which wild animal you think it will be?");		
+
+		background.setIcon(new ImageIcon(Main.class.getResource("/Images/jungle.jpg")));
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You have a treasure map that leads to ancient relic. \nYou are now at the entrance of amazon jungle \n\nYou heard a nearby bush rustle.\nYou panic and you start to run.\n\n Which wild animal you think it will be?");		
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
 		choice1.setText("Snake");
 		choice2.setText("Tiger");
 		choice3.setText("Monkey");
-		choice4.setText("");
+		choice4.setText("*Knowledge Bank*");
 	}
 
 	public void Monkey(){
 		position="monkey";
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("Your guess is a monkey.Click next to solve a puzzle to continue your journey.");
+		mainTextArea.setText("Your guess is a monkey. Solve a puzzle to continue your journey.");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText(">"); // puzzle console
 		choice2.setText("");
 		choice3.setText("");
@@ -237,17 +297,17 @@ public class Main {
 
 	public void Snake(){
 		position= "snake";
-		
+
 		mainTextPanel.removeAll();
 		mainTextArea.setText("Your guess is a snake.Click next to solve a puzzle to continue your journey.");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText(">");// puzzle console
 		choice2.setText("");
 		choice3.setText("");
@@ -256,17 +316,17 @@ public class Main {
 
 	public void Tiger(){
 		position="tiger";
-		
+
 		mainTextPanel.removeAll();
 		mainTextArea.setText("Your guess is a tiger.Click next to solve a puzzle to continue your journey.");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText(">");// puzzle console
 		choice2.setText("");
 		choice3.setText("");
@@ -276,17 +336,19 @@ public class Main {
 
 	public void crossRoad(){
 		position = "crossRoad";
+
+		background.setIcon(new ImageIcon(Main.class.getResource("/Images/You are lost.jpg")));
 		
 		mainTextPanel.removeAll();
 		mainTextArea.setText("You take a look behind you.\n\n Sadly, it was just a wild rabbit and you ran away like a little girl.\n\nYou are now lost.\nChoose where you want to go");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText("Go north");
 		choice2.setText("Go east");
 		choice3.setText("Go west");
@@ -297,18 +359,18 @@ public class Main {
 	//
 	public void north(){
 		position = "north";
-		
+
 		mainTextPanel.removeAll();
-		mainTextArea.setText("You head back to where you begin.");
+		mainTextArea.setText("Somehow you end up at the entrance of the jungle again.");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
-		choice1.setText("Go back to the crossroad");
+
+		choice1.setText("Continue on");
 		choice2.setText("");
 		choice3.setText("");
 		choice4.setText("");
@@ -318,7 +380,7 @@ public class Main {
 	//will come to east method
 	public void east(){
 		position = "east";
-		
+
 		mainTextPanel.removeAll();
 		mainTextArea.setText("There is nothing here. Go back");
 		mainTextPanel.add(mainTextArea);
@@ -326,13 +388,13 @@ public class Main {
 		weapon = "Long Sword";
 		weaponLabelName.setText(weapon);
 		 */
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText("Go back to the crossroad");
 		choice2.setText("");
 		choice3.setText("");
@@ -344,17 +406,17 @@ public class Main {
 	//will come to west method
 	public void west(){
 		position = "west";
-		
+
 		mainTextPanel.removeAll();
 		mainTextArea.setText("As you walk, a monkey jump to you and snatch your hat.\n\nWhat you going to do?");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText("Just let it be");
 		choice2.setText("Chase the monkey");
 		choice3.setText("");
@@ -364,17 +426,17 @@ public class Main {
 
 	public void chaseMonkey(){
 		position ="chasemonkey";
-		
+
 		mainTextPanel.removeAll();
 		mainTextArea.setText("The monkey ran away.\n\n You gave up chasing it.\n\n You are thinking what to do next.");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText("Find some fruits to eat."); //Another puzzle game
 		choice2.setText("Find a way out"); //discover secret code that may helpful later on
 		choice3.setText("Just sit and relax");// wake up and player is in the temple
@@ -383,17 +445,17 @@ public class Main {
 
 	public void ruinTemple(){
 		position = "ruintemple";
-		
+
 		mainTextPanel.removeAll();
 		mainTextArea.setText("As you are thinking a way out.\n You discover a ruin temple.\n\n So you take your chance to discover more.");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText("Discover the temple");//will get secret code
 		choice2.setText("");
 		choice3.setText("");
@@ -402,17 +464,19 @@ public class Main {
 
 	public void findFruit(){
 		position="findfruit";
+
+		background.setIcon(new ImageIcon(Main.class.getResource("/Images/Fruits garden.jpg")));
 		
 		mainTextPanel.removeAll();
-		mainTextArea.setText("You walk for a long time and you feel the thirst burns your throat and the sun is so hot.You are hungry and exhausted.\n\n You trip and fall onto a stone. You cry in pain and found out it is a code wait to be solve.");//will discover secret code
+		mainTextArea.setText("After a long time, you feel so thirsty due to the hot weather. \nYou are hungry and exhausted.\n\nYou trip and fall onto a stone accidentally.\nYou found a combitnation set of numbers on the stone.");//will discover secret code
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText("Solve the code");//will get secret code// here is the scramble puzzle take place
 		choice2.setText("Walk away");// will end up aWayOut
 		choice3.setText("");
@@ -422,17 +486,19 @@ public class Main {
 
 	public void aWayOut(){
 		position="awayout";
+
+		background.setIcon(new ImageIcon(Main.class.getResource("/Images/Parrot.jpg")));
 		
 		mainTextPanel.removeAll();
-		mainTextArea.setText("A parrot sang a song to you.\nIt said if you know what is the song it is singing.It will give you the secret code.");//will discover secret code
+		mainTextArea.setText("A parrot sang a song.\n\nYou have to guess the title of the song in order to get the secret code.");//will discover secret code
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText("Accept its challenge.");//will get secret code// here is the scramble puzzle take place
 		choice2.setText("Walk away");// will end up in the temple
 		choice3.setText("");
@@ -441,17 +507,19 @@ public class Main {
 
 	public void sitAndRelax(){
 		position="sitandrelax";//end up in temple
+
+		background.setIcon(new ImageIcon(Main.class.getResource("/Images/Sit down and rest.jpg")));
 		
 		mainTextPanel.removeAll();
-		mainTextArea.setText("You sat down and relax.\n\n You just want to go home.\n\n Something hit you hard and you pass out.");
+		mainTextArea.setText("You sat and relax.\n\n Something hit you and you passed out.");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText(">");// wakeUp()
 		choice2.setText("");
 		choice3.setText("");
@@ -460,17 +528,19 @@ public class Main {
 
 	public void wakeUp(){
 		position="wakeup";
-		
+
+		background.setIcon(new ImageIcon(Main.class.getResource("/Images/jungletemple.jpg")));
+
 		mainTextPanel.removeAll();
 		mainTextArea.setText("You found yourself in a ruined temple mysteriously after you woke up.");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText(">");// discovertemple()
 		choice2.setText("");
 		choice3.setText("");
@@ -479,36 +549,379 @@ public class Main {
 
 	public void discoverTemple(){
 		position ="discovertemple";
-		
+
+		background.setIcon(new ImageIcon(Main.class.getResource("/Images/temple.jpg")));
+
 		mainTextPanel.removeAll();
 		mainTextArea.setText("You look around and there is two tunnels.Which tunnel should you go?");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
+
 		choice1.setText("Left tunnel"); //Step on floor and arrows comes out 
 		choice2.setText("Right tunnel"); //To be continue 
 		choice3.setText("");
 		choice4.setText("");
 	}
 
-	public void leftTunnel(){
-		//Step on the floor and arrows come out
-		//Left and Right point counts (maybe later)
+	//left tunnel scenarios
+	public void leftTunnelConfirm(){
+		position = "leftTunnelConfirm";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("I hope you won't regret your choice. \nYou choose to be in the left tunnel. \n\nDo you want to change your decicion?");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText("Yes"); //Step on floor and arrows comes out 
+		choice2.setText("No"); //To be continue 
+		choice3.setText("");
+		choice4.setText("");
 	}
 
-	public void rightTunnel(){
-		//Wall closing 
+	public void leftTunnelGoodLuck(){
+		//Step on the floor and arrows come out
+		//Left and Right point counts (maybe later)
+		position ="leftTunnelGoodLuck";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Good luck, I hope you will make your way out the temple alive.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //Step on floor and arrows comes out 
+		choice2.setText(""); //To be continue 
+		choice3.setText("");
+		choice4.setText("");
 	}
-	public void codeSolve(){
-		position="codesolve";
+
+	public void leftTunnel(){
+		position = "leftTunnel";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You walk your way through a dark and scary temple. \nThere aren't any signs of living in the tunnel and you can barely see the path ahead.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); 
+		choice2.setText(""); //To be continue 
+		choice3.setText("");
+		choice4.setText("");
+	}
+
+	public void leftTunnelTrap1(){
+		position = "leftTunnelTrap1";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Suddenly, you take a wrong step and you heard 'click-clark!'. Part of the floor starts to sink.\n\n You start to feel cold sweat running down your face. \nYour expression went wild when arrows flew toward your direction.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); 
+		choice2.setText(""); //To be continue 
+		choice3.setText("");
+		choice4.setText("");
+	}
+
+	public void leftTunnelTrapDecision1(){
+		position = "leftTunnelTrapDecision1";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You should: ");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText("Bend down"); 
+		choice2.setText("Stand still"); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void leftTunnelTrapDecision2(){
+		position = "leftTunnelTrapDecision2";
 		
 		mainTextPanel.removeAll();
-		mainTextArea.setText("You get the secret numbers.\n\nRemember the number, it might help you later on.");
+		mainTextArea.setText("The arrows missed you. \nBut you already feel dead inside knowing that there will be more arrows to come. \n\nA few moments later, two more arrows flew out towards your left. \nYou should: ");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText("Bend to your right"); 
+		choice2.setText("Bend to your left"); 
+		choice3.setText("Stand still");
+		choice4.setText("");
+	}
+	
+	public void leftTunnelHiddenSwitch(){
+		position = "leftTunnelHiddenSwitch";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("The arrows missed you once again. Good job! \n\n As you turn to the path ahead, you caught a glimpse of a hidden switch between two pillars. \n\nWhat do you do?");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText("Run to the switch"); 
+		choice2.setText("Ignore and try to escape"); 
+		choice3.setText("Look for another way");
+		choice4.setText("");
+	}
+
+	public void leftTunnelPressSwitch(){
+		position = "leftTunnelPressSwitch";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You run towards the switch as fast as you can. \n\nWith hopes that the switch does not trigger additional traps, you pressed the switch.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); 
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void leftTunnelDoorOpen(){
+		position = "leftTunnelDoorOpen";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("The sound of whirring trap mechanisms stop. A door at the end of the tunnel opens.\n\n You go through the door and found yourself in a mysterious room.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); 
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void leftTunnelAnotherWay(){
+		position = "leftTunnelAnotherWay";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You hide behind a pile of rubble and as you look around, you see a small passage across you. \n\nCrawl through the passageway?");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText("Yes"); 
+		choice2.setText("No"); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void leftTunnelCrawl(){
+		position = "leftTunnelCrawl";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You run towards the passageway and start crawling on all fours into the dark.\n\n Few minutes later, you found yourself at a mysterious room.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); 
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void leftTunnelGenie(){
+		position = "leftTunnelGenie";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Feeling relieved that the trap was over, you look around the room when a mysterious genie suddenly appears and asks you to solve his question in return for a code to the ancient relic.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText("Accept the challenge"); 
+		choice2.setText("It is now or never"); 
+		choice3.setText("Try walking away");
+		choice4.setText("");
+	}
+	
+	public void leftTunnelGeniePuzzle(){
+		position = "leftTunnelGeniePuzzle";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("The genie moves closer to you with great desperation in its eyes.\n\nYou could not ignore his pleas and decided to solve his question.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); 
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void leftTunnelRelic(){
+		position = "leftTunnelRelic";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You make a long series of rights and lefts as instructed from the genie's code. \n\n Just as you were beginning to have doubts...");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); 
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void leftTunnelDie(){
+		position = "leftTunnelDie";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You didn't manage to dodge the trap and died. Go back and make your choice again.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); 
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void rightTunnel(){
+		position ="rightTunnel";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You walk your way through a dark and scary temple.\n There aren't any livings in the tunnel and you can't barely see the path.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //Proceed story
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void rightTunnelStatue(){
+		/**/
+		
+		position ="righttunnelstatue";
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You decide to take a rest on a statue and there the statue head bend to a side, the wall surrounding you start to move.\n\n You start to scream for help\nThen you realize the walls have been narrow down.");
+		mainTextPanel.add(mainTextArea);
+		
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //Proceed story
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");	
+		
+	}
+	
+	public void rightTunnelHitWall(){
+		
+		position ="righttunnelhitwall";
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You try to hit the wall and hurt your hands.\n\n Out of nowhere, the sand start to fall from above.\n Is hard to tell how the sand start to come in, but you will skip that part and try to save yourself.");
+		mainTextPanel.add(mainTextArea);
+		
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //Proceed story
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+		
+	}
+	
+	public void rightTunnelKeepCool(){
+		//righttunnelkeepcool
+		
+		position ="righttunnelkeepcool";
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You keep your cool and try to find a way out. ");
 		mainTextPanel.add(mainTextArea);
 		
 		//usually do revalidate together with repaint
@@ -517,88 +930,267 @@ public class Main {
 		con.revalidate();
 		con.repaint();
 		
+		choice1.setText("Try to feel the walls to see whether is there any switch"); //rightTunnelSwitch()
+		choice2.setText("Continue hit the walls"); //rightTunnelCHitWall()
+		choice3.setText("Shout for help ");//rightTunnelShout()
+		choice4.setText("");
+	}
+	
+	public void rightTunnelSwitch(){
+		
+		//You feel the switch and you press the switch with all your strength.
+		
+		position = "righttunnelswitch";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You feel the switch and you press the switch with all your strength.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //Continue
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void rightTunnelPressSwitch(){
+		//The walls goes back to normal and the sand stop coming down from nowhere.\n\n You cough and try to catch your breath before you continue your journey.
+		position = "righttunnelpressswitch";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("The walls goes back to normal and the sand stop coming down from nowhere.\n\n You cough and try to catch your breath before you continue your journey.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //Continue
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+		
+	}
+	
+	public void rightTunnelCHitWall(){
+		position = "righttunnelchitwall";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Eventually that doesn't help.You die in the game. Choose your choice again.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //Continue back to the tunnelkeepcool
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void rightTunnelShout(){
+		position = "righttunnelshout";
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Eventually that doesn't help.You die in the game. Choose your choice again.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //Continue back to the tunnelkeepcool
+		choice2.setText(""); 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	
+	public void rightTunnelConfirm(){
+		position = "rightTunnelConfirm";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("I hope you won't regret your choice. \nYou choose to be in the right tunnel. \n\nDo you want to change your decicion?");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText("Yes"); //Step on floor and arrows comes out 
+		choice2.setText("No"); //To be continue 
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void rightTunnelGoodLuck(){
+		//Step on the floor and arrows come out
+		//Left and Right point counts (maybe later)
+		position ="rightTunnelGoodLuck";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Good luck, I hope you will make your way out the temple alive.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //
+		choice2.setText(""); //To be continue 
+		choice3.setText("");
+		choice4.setText("");
+	}
+
+	public void rightTunnelSafeAtLast(){
+		position ="righttunnelsafeatlast";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("The walls goes back to normal and the sand stop coming down from nowhere.\n\n You cough and try to catch your breath before you continue your journey.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //Go to genie
+		choice2.setText("");  
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void codeSolve(){
+		position="codesolve";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("You obtained the secret numbers.\n\nRemember the number code.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">"); //For findFruit() and awayout - Accept challenge will have different outcomes
+		choice2.setText("");  
+		choice3.setText("");
+		choice4.setText("");
+	}
+	
+	public void askToSolve(){
+		prevPosition = position;
+		position="askToSolve";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Solve a puzzle to continue your journey.");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText(">");
+		choice2.setText("");  
+		choice3.setText("");
+		choice4.setText("");
+	}
+
+	public void trapSolve(){
+		position="trapsolve";
+		lastPuzzle = true;
+		
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Congratulations, you solved the puzzle game.\n");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
 		choice1.setText(">"); //For findFruit() and awayout - Accept challenge will have different outcomes
 		choice2.setText("");  
 		choice3.setText("");
 		choice4.setText("");
 	}
 
-
 	//story end
 	public void ending(){
 		position = "ending";
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("Guard: Oh you killed that goblin!?\nThank you so much. You are true hero!\nWelcome to our town!\n\n");
+		mainTextArea.setText("You arrive at the heart of the ruined temple. \nYou found the ancient relic.\nYay! You did it!");
 		mainTextPanel.add(mainTextArea);
-		
+
 		//usually do revalidate together with repaint
 		//when there is a change in UI components
 		//revalidate used on the HIGHEST AFFECTED COMPONENT
 		con.revalidate();
 		con.repaint();
-		
-		choice1.setText("");
-		choice2.setText("");
+
+		choice1.setText("THE END");
+		choice2.setText("");  
 		choice3.setText("");
 		choice4.setText("");
-		choice1.setVisible(false);
-		choice2.setVisible(false);
-		choice3.setVisible(false);
-		choice4.setVisible(false);
 	}
 
-	public String doPuzzleGame(){
-		/*
+	public void restart(){
+		position = "restart";
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Congratulations on completing the game. \n\n Do you want to restart?");
+		mainTextPanel.add(mainTextArea);
+
+		//usually do revalidate together with repaint
+		//when there is a change in UI components
+		//revalidate used on the HIGHEST AFFECTED COMPONENT
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText("Restart");
+		choice2.setText("End");  
+		choice3.setText("");
+		choice4.setText("");
+	}
+
+	public void GameRandomizer() {
+		puzzleSuccess = false;
+		scramblerSuccess = false;
+		
 		Random rand = new Random();
-		int randomInt = rand.nextInt(1); //either get 0 or 1
-		 */
-
-		int random = 0;
-		String userProgress = "";
-
-		switch(random){
-		//scrambled Words
+		int seed = rand.nextInt(2);
+		//int seed = 1;
+		
+		switch (seed) {
 		case 0:
-			sliderPuzzle puzzle = new sliderPuzzle();
-			puzzleComplete = "progress";
-
-			Thread checkingThread = new Thread(){			
-				public void run(){
-					for (;;){
-						try {
-							sleep(1000);
-						
-							puzzleComplete = puzzle.getUserProgress();
-
-							if (puzzleComplete == "skipped" || puzzleComplete == "completed"){
-								window.setVisible(true);
-								
-							}
-							
-						}catch (Exception e){
-							Thread.currentThread().interrupt();
-						}
-					}
-				}
-			};
-
-			if (puzzleComplete == "progress"){
-				window.setVisible(false);
-				checkingThread.start();
-			}
-			else
-				userProgress = puzzle.getUserProgress();
-
+			puzzleSuccess = PuzzleGame.Main.main(puzzleSuccess);
 			break;
-
-			//slider puzzle
 		case 1:
-
+			scramblerSuccess = WordScrambler.UIMain.main(scramblerSuccess);
 			break;
 		}
-
-		return userProgress;
 	}
 
 	//handle the screen 
@@ -667,33 +1259,70 @@ public class Main {
 					//switch(yourChoice){case "c1":townGate();}
 					break;
 
+				case "c4":
+					knowledgeBank();
+					break;
 				}
+				break;
+				
 			case "snake":
 				switch(yourChoice){
-				case "c1": crossRoad(); break;
+				case "c1": 
+					GameRandomizer();
+					//window.setVisible(false);
+					crossRoad();
+					/*
+					if (puzzleSuccess == true || scramblerSuccess == true){
+						puzzleSuccess = false;
+						scramblerSuccess = false;
+						crossRoad(); 
+					}
+					else {
+						System.out.println("You failed!");
+						crossRoad();	//change
+					}*/
+					
+					break;
 				}
 				break;
 
 			case "tiger":
 				switch(yourChoice){
-				case "c1": crossRoad(); break;
+				case "c1":
+					GameRandomizer();
+					crossRoad();
+					/*
+					if (puzzleSuccess == true || scramblerSuccess == true){
+						puzzleSuccess = false;
+						scramblerSuccess = false;
+						crossRoad(); 
+					}
+					else {
+						System.out.println("You failed!");
+						crossRoad();	//change
+					}*/ 
+					
+					break;
 				}
 				break;
 
 			case "monkey":
 				switch(yourChoice){
 				case "c1":
-					userProgress = doPuzzleGame();
-					crossRoad(); 
+					GameRandomizer();
+					crossRoad();
 					
-					if (puzzleComplete == "skipped"){
-						//minus points
-					}
-					else if (puzzleComplete == "completed") {
-						//add points continue to crossroad
+					/*
+					if (puzzleSuccess == true || scramblerSuccess == true){
+						puzzleSuccess = false;
+						scramblerSuccess = false;
 						crossRoad(); 
 					}
-
+					else {
+						System.out.println("You failed!");
+						crossRoad();	//change
+					}*/
+					
 					break;
 				}
 				break;
@@ -714,11 +1343,28 @@ public class Main {
 				}
 				break; 
 
-
+			case "askToSolve":
+				switch(yourChoice){
+				case "c1":
+					System.out.println(puzzleSuccess);
+					System.out.println(scramblerSuccess);
+					
+					if (puzzleSuccess || scramblerSuccess){
+						//reset puzzle state
+						puzzleSuccess = false;
+						scramblerSuccess = false;
+						
+						codeSolve();
+					}
+					break;
+				}
+				break;
+				
 			case "findfruit":
 				switch(yourChoice){
 				case "c1":
-					codeSolve();
+					GameRandomizer();
+					askToSolve();
 					break;
 
 				case "c2":
@@ -732,6 +1378,8 @@ public class Main {
 			case "awayout":
 				switch(yourChoice){
 				case "c1":
+					GameRandomizer();
+					askToSolve();
 					codeSolve();
 					break;
 
@@ -763,32 +1411,328 @@ public class Main {
 
 				break;	
 				//here	
-			case "discovertenple":
+
+			case "ruintemple":
 				switch(yourChoice){
 				case "c1":
-					leftTunnel();
+					discoverTemple();
+					break;
+				}
+
+				break;
+
+			case "discovertemple":
+				switch(yourChoice){
+				case "c1":
+					leftTunnelConfirm();
 					break;
 
 				case "c2":
-					rightTunnel();
+					rightTunnelConfirm();
 					break;
 				}
 
 				break;	
 
+			case "leftTunnelConfirm":
+				switch (yourChoice){
+				case "c1":
+					discoverTemple();
+					break;
+
+				case "c2":
+					leftTunnelGoodLuck();
+					break;
+				}
+				break;
+
+			case "leftTunnelGoodLuck":
+				switch (yourChoice){
+				case "c1":
+					leftTunnel();
+					break;
+				}
+				break;
+
+			case "rightTunnelGoodLuck":
+				switch (yourChoice){
+				case "c1":
+					rightTunnel();
+					break;
+				}
+				break;
+
+			case "rightTunnelConfirm":
+				switch (yourChoice){
+				case "c1":
+					discoverTemple();
+					break;
+
+				case "c2":
+					rightTunnelGoodLuck();
+					break;
+				}
+				break;
+
+			case "leftTunnel":
+				switch (yourChoice){
+				case "c1":
+					leftTunnelTrap1();
+					break;
+				}
+				break;
+				
+			case "leftTunnelTrap1":
+				switch (yourChoice){
+				case "c1":
+					leftTunnelTrapDecision1();
+					break;
+				}
+				break;
+				
+			case "leftTunnelTrapDecision1":
+				switch(yourChoice){
+				case "c1":
+					leftTunnelTrapDecision2();
+					break;
+				case "c2":
+					leftTunnelDie();
+					break;
+				}
+				break;
+				
+			case "leftTunnelDie":
+				switch(yourChoice){
+				case "c1":
+					leftTunnelTrap1();
+					break;
+				}
+				break;
+				
+			case "leftTunnelTrapDecision2":
+				switch(yourChoice){
+				case "c1":
+					leftTunnelHiddenSwitch();
+					break;
+				case "c2":
+					leftTunnelDie();
+					break;
+				case "c3":
+					leftTunnelDie();
+					break;
+				}
+				break;
+				
+			case "leftTunnelHiddenSwitch":
+				switch(yourChoice){
+				case "c1":
+					leftTunnelPressSwitch();
+					break;
+				case "c2":
+					leftTunnelDie();
+					break;
+				case "c3":
+					leftTunnelAnotherWay();
+					break;
+				}
+				break;
+				
+			case "leftTunnelPressSwitch":
+				switch(yourChoice){
+				case "c1":
+					leftTunnelDoorOpen();
+					break;
+				}
+				break;
+				
+			case "leftTunnelDoorOpen":
+				switch (yourChoice){
+				case "c1":
+					leftTunnelGenie();
+					break;
+				}
+				break;
+				
+			case "leftTunnelAnotherWay":
+				switch(yourChoice){
+				case "c1":
+					leftTunnelGenie();
+					break;
+				case "c2":
+					leftTunnelPressSwitch();
+					break;
+				}
+				break;
+				
+			case "leftTunnelGeniePuzzle":
+				switch (yourChoice){
+				case "c1":
+					trapSolve();
+					break;
+				}
+				break;
+				
+			case "leftTunnelGenie":
+				switch (yourChoice){
+				case "c1":
+					GameRandomizer();
+					leftTunnelGeniePuzzle();
+					break;
+				case "c2":
+					GameRandomizer();
+					leftTunnelGeniePuzzle();
+					break;
+				case "c3":
+					GameRandomizer();
+					leftTunnelGeniePuzzle();
+					break;
+				}
+				break;
+				
+			case "leftTunnelRelic":
+				switch (yourChoice){
+				case "c1":
+					ending();
+					break;
+				}
+				break;
+				
+			case "rightTunnel":
+				switch (yourChoice){
+				case "c1":
+					rightTunnelStatue();
+					break;
+				}
+				break;
+				
+			case"righttunnelstatue":
+				switch (yourChoice){
+				case "c1":
+					rightTunnelHitWall();
+					break;
+				}
+				break;
+				
+			//righttunnelhitwall
+				
+			case"righttunnelhitwall":
+				switch (yourChoice){
+				case "c1":
+					rightTunnelKeepCool();
+					break;
+				}
+				break;
+				
+			case"righttunnelkeepcool":
+				switch (yourChoice){
+				case "c1":
+					rightTunnelSwitch();
+					break;
+				
+				case "c2":
+					rightTunnelCHitWall();
+					break;
+					
+				case "c3":
+					rightTunnelShout();
+					break;
+					
+				}
+				break;
+			case"righttunnelswitch":
+				
+				switch(yourChoice){
+				case "c1":
+					rightTunnelPressSwitch();
+					break;
+				}
+				
+				break;
+				
+			case"righttunnelpressswitch":
+				
+				switch(yourChoice){
+				case "c1":
+					rightTunnelSafeAtLast();
+					break;
+				}
+				break;
+			case"righttunnelsafeatlast":
+				
+				switch(yourChoice){
+				case "c1":
+					leftTunnelGenie();
+					break;
+				}
+				break;
+				
+				
+			case"righttunnelchitwall":
+				switch(yourChoice){
+				case "c1":
+					rightTunnelKeepCool();
+					break;
+				}
+				
+				break;
+				
+			case"righttunnelshout":
+				
+				switch(yourChoice){
+				case "c1":
+					rightTunnelKeepCool();
+					break;
+				}
+				
+				break;
 
 			case "codesolve":
 				switch(yourChoice){
 				case "c1":
-					//WILL ADD IN LATER
+					switch(prevPosition){
+					case "findfruit":
+						crossRoad();
+						break;
+					case "":
+					}
+					
+					break;
+				}
+				break;
+
+			case "trapsolve":
+				switch (yourChoice){
+				case "c1":
+					if (lastPuzzle == true)
+						ending();
+					else
+						rightTunnel();
+					break;
+				}
+				break;
+
+			case "ending":
+				switch (yourChoice){
+				case "c1":
+					restart();
+				}
+				break;
+
+			case "restart":
+				switch (yourChoice){
+				case "c1":
+					con.revalidate();
+					con.repaint();
+					puzzleSuccess = false;
+					scramblerSuccess = false;
+					wildAnimal();
+					break;
+				case "c2":
+					//close the program
+					System.exit(0);
 					break;
 				}
 			}//endSwitch
-
-
 		}//endActionPerformed
 	}//endChoiceHandler
-
-
-
 }//endMain
