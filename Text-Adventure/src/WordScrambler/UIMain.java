@@ -3,6 +3,7 @@ package WordScrambler;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -20,7 +21,7 @@ public class UIMain
 	 */
 
 	static boolean windowClose = false;
-	private static boolean scramblerComplete;
+	public static boolean scramblerComplete;
 	static JFrame frame;
 	volatile static boolean stopThread; 
 
@@ -44,7 +45,8 @@ public class UIMain
 	{
 		setScramblerStatus(false);
 		// Edit here to use a different word file
-		final String filename = "words2.txt";
+		final String question = "Questions.txt";
+	    final String answer = "Answers.txt";
 
 		// Edit here to change the seed for the WordScrambler's
 		// random number generator.  For unpredictable behavior,
@@ -58,7 +60,7 @@ public class UIMain
 		{
 			public void run()
 			{
-				createAndShow(filename, seed);
+				createAndShow(question, answer, seed);
 			}
 		};
 
@@ -74,10 +76,10 @@ public class UIMain
 	 * @param seed
 	 *   seed for random number generator in the WordScrambler
 	 */
-	private static void createAndShow(String filename, int seed)
+	private static void createAndShow(String question, String answer, int seed)
 	{
 		// the main window for this application
-		frame = new JFrame("Com S 227 Word Scramble");
+		frame = new JFrame("Word Scrambler");
 		//used for programmatically closing the JFrame later
 		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 		frame.setUndecorated(true);
@@ -86,19 +88,20 @@ public class UIMain
 		try
 		{
 			// this may throw FileNotFoundException
-			Words wordList = new Words(filename);   
+			Words questionList = new Words(question); 
+		    Words answerList = new Words(answer);   
 
 			// scoring based on 
 			//    5 seconds per letter
 			//    5 second penalty for a letter hint
 			//    1/10 second penalty for rescrambling
 			//    1-second penalty for submitting an incorrect guess
-			ScoreCalculator calc = new ScoreCalculator(5000, 5000, 100, 1000);
+			ScoreCalculator calc = new ScoreCalculator(5000, 5000, 100, 10);
 			Random rand = new Random(seed);
 			PermutationGenerator pg = new PermutationGenerator(rand);
 
 			// construct the main game panel and add it to the frame
-			JPanel mainPanel = new WordGameUI(calc, wordList, rand, pg);
+			JPanel mainPanel = new WordGameUI(calc, questionList, answerList, rand, pg);
 			frame.getContentPane().add(mainPanel);
 
 			// size the frame based on the preferred size of the mainPanel
@@ -123,6 +126,13 @@ public class UIMain
 			frame.setVisible(true);
 		}
 		catch (FileNotFoundException e)
+		{
+			System.out.println(e);
+			JOptionPane.showMessageDialog(frame, "Unable to open word file: " + e.getMessage());
+			frame.dispose();
+			windowClose = true;
+		}
+		catch (IOException e)
 		{
 			System.out.println(e);
 			JOptionPane.showMessageDialog(frame, "Unable to open word file: " + e.getMessage());

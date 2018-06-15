@@ -92,9 +92,8 @@ public class ScoreCalculator
 	  hintCount++;
 	  
 	  if (hintCount > 3)
-		  maxScore = 0;
-	  else
-		  maxScore--;
+		  maxScore -= 5;
+
   }
 
   /**

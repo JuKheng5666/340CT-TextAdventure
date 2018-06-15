@@ -4,10 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -33,7 +31,8 @@ public class WordGameUI extends JPanel
   /**
    * Format string for printing scores at top of window.
    */
-  private static final String SCORE_FORMAT_STRING = "Time: %-10d Score: %-10d";
+  private static final String SCORE_FORMAT_STRING = "Time: %-10d Score: %-10d";  
+  private static String QUESTION_FORMAT_STRING = "Read the question.";  
   
   /**
    * Serial version number, not used.
@@ -46,6 +45,7 @@ public class WordGameUI extends JPanel
   private JButton rescrambleButton;
   private JButton startButton;
   private JLabel scoreLabel;
+  private JLabel questionLabel;
   private Timer timer;
   
   /**
@@ -66,7 +66,8 @@ public class WordGameUI extends JPanel
   /**
    * Word generator for this UI.
    */
-  private Words wordList;
+  private Words questionList;
+  private Words answerList;
   
   /**
    * Total score obtained since UI was started.
@@ -105,10 +106,11 @@ public class WordGameUI extends JPanel
    * @param pg
    *   permutation generator for scrambling words
    */
-  public WordGameUI(ScoreCalculator scorer, Words wordList, Random rand, PermutationGenerator pg)
+  public WordGameUI(ScoreCalculator scorer, Words questionList, Words answerList, Random rand, PermutationGenerator pg)
   {
     this.scorer = scorer;
-    this.wordList = wordList;
+    this.questionList = questionList;
+    this.answerList = answerList;
     this.rand = rand;
     this.pg = pg;
     roundOver = true;
@@ -123,6 +125,8 @@ public class WordGameUI extends JPanel
     startButton = new JButton("Start");
     String labelText = String.format(SCORE_FORMAT_STRING, 60, 0, totalScore);
     scoreLabel = new JLabel(labelText);
+    String questionText = String.format(QUESTION_FORMAT_STRING);
+    questionLabel = new JLabel(questionText);
  
     // create a timer that will fire every TIMER_INTERVAL ms
     // for updating the score
@@ -139,6 +143,11 @@ public class WordGameUI extends JPanel
     buttonPanel.add(hintButton);
     buttonPanel.add(rescrambleButton);
     buttonPanel.add(submitButton);
+    
+    // Question
+    questionLabel.setFont(new Font("Serif", Font.PLAIN, 24));
+    questionLabel.setVerticalAlignment(SwingConstants.CENTER);
+    questionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
     // add callbacks for buttons
     ActionListener submitHandler = new SubmitButtonHandler();
@@ -158,6 +167,7 @@ public class WordGameUI extends JPanel
     
     // custom panel for drawing the letters
     wordPanel = new WordCanvas();
+    wordPanel.add(questionLabel);
     
     // score on top, buttons in middle, letters on bottom
     this.setLayout(new BorderLayout());
@@ -197,6 +207,8 @@ public class WordGameUI extends JPanel
       UIMain.frame.dispose();
       //System.exit(0);
     }
+    else
+    	UIMain.setScramblerStatus(false);
 
     totalScore += currentScore;
     String labelText = String.format(SCORE_FORMAT_STRING, timerCounter, currentScore, totalScore);
@@ -204,18 +216,15 @@ public class WordGameUI extends JPanel
     repaint();
     
 	if (failAttempt == 2) {
-		currentScore = -1;
-		JOptionPane.showMessageDialog(null, "Failed, your score is " + currentScore); 
+		currentScore = -1; 
 	}
 	else if (failAttempt == 1) {
-		currentScore = -2;
-		JOptionPane.showMessageDialog(null, "Failed, your score is " + currentScore); 
+		currentScore = -2; 
 	}
     
     if(failAttempt == 0) {
-    	currentScore = -14;
-    	JOptionPane.showMessageDialog(null, "Failed, your score is " + currentScore);    	
-    	UIMain.setScramblerStatus(true);
+    	currentScore = -14;    	
+    	UIMain.setScramblerStatus(false);
         UIMain.setFrameStatus(true);
         
         //System.exit(0);
@@ -233,14 +242,20 @@ public class WordGameUI extends JPanel
     {
       // Depending on how the WordScrambler is implemented,
       // this may throw FileNotFoundException...
-      String word = wordList.getWord(rand); 
+      int questionNo = questionList.getQuestion(rand);
+      
+      String question = questionList.getWord(questionNo);
+      String answer = answerList.getWord(questionNo);
 
-      String hidden = WordScrambler.scramble(word, pg);
-      wordPair = new WordPair(word, hidden);
+      String hidden = WordScrambler.scramble(answer, pg);
+      
+      wordPair = new WordPair(answer, hidden);
 
       if (wordPair.isSolutionPossible())
       {
-    	  int initialScore = 0;
+    	  int initialScore = TextAdventure.Main.getPlayerScore();
+    	  
+    	  /*
     	  if (failAttempt == 3)
     		  initialScore = 50;
     	  else if (failAttempt == 2)
@@ -248,24 +263,25 @@ public class WordGameUI extends JPanel
     	  else if (failAttempt == 1)
     			initialScore = 10;
     	  else
-    		  initialScore = 0;
+    		  initialScore = 0; */
     	  
         roundOver = false;
         startButton.setText("Give up");
         hintButton.setEnabled(true);
         rescrambleButton.setEnabled(true);
         submitButton.setEnabled(true);
-        scorer.start(word.length(), initialScore);
+        scorer.start(answer.length(), initialScore);
         initialScore = scorer.getPossibleScore();
         String labelText = String.format(SCORE_FORMAT_STRING, 60, initialScore, totalScore);
         scoreLabel.setText(labelText);
+        questionLabel.setText(question);
         wordPanel.startRound(wordPair);
         startTime = System.currentTimeMillis();
         timer.start(); 
       }
       else
       {
-        String msg = "Error: isSolutionPossible returns false for '" + word + "' and '" + hidden + "'";
+        String msg = "Error: isSolutionPossible returns false for '" + answer + "' and '" + hidden + "'";
         JOptionPane.showMessageDialog(this.getParent(), msg);        
       }
     }
@@ -276,7 +292,7 @@ public class WordGameUI extends JPanel
     }
     catch (Exception e)  // possible FileNotFoundException
     {
-      String msg = "Exception: " + e;
+      String msg = "AAAException: " + e;
       JOptionPane.showMessageDialog(this.getParent(), msg);
       
       //System.exit(1);
@@ -323,17 +339,11 @@ public class WordGameUI extends JPanel
       {
         endRound(true);
         //To Be Updated with Text-Adventure Source Code
-        JOptionPane.showMessageDialog(null, "Success!!!");
+        TextAdventure.Main.setPlayerScore(totalScore);
         
         //System.exit(0);
         UIMain.stopThread = true;
-        
-        UIMain.setScramblerStatus(true);
-        UIMain.setFrameStatus(true);
-        
         UIMain.frame.dispose();
-        
-        JOptionPane.showMessageDialog(null, UIMain.getScramblerStatus());
       }
       else
       {

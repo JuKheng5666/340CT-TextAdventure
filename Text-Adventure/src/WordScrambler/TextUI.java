@@ -55,7 +55,7 @@ public class TextUI
    */
   public static void main(String[] args) throws FileNotFoundException
   {
-    new TextUI("words2.txt").go();
+    //new TextUI("words2.txt").go();
   }
 
   /**
@@ -73,7 +73,7 @@ public class TextUI
     pg = new PermutationGenerator(rand);
 
     // this may throw FileNotFoundException
-    wordList = new Words(filename);
+    //wordList = new Words(filename);
 
     // scoring based on:
     // 10 seconds per letter
@@ -88,7 +88,7 @@ public class TextUI
    * 
    * @throws FileNotFoundException
    */
-  public void go() throws FileNotFoundException
+  /*public void go() throws FileNotFoundException
   {
     long startTime = System.currentTimeMillis();
     WordPair game = initializeWord();
@@ -164,7 +164,7 @@ public class TextUI
       }
 
     }
-  }
+  }*/
 
   /**
    * Displays the score and the current scrambled word.
@@ -294,12 +294,12 @@ public class TextUI
    * @throws FileNotFoundException
    *   if attempting to get a new word requires opening the word file and fails
    */
-  private WordPair initializeWord() throws FileNotFoundException
+  /*private WordPair initializeWord() throws FileNotFoundException
   {
     String word = wordList.getWord(rand);
     String scrambledWord = WordScrambler.scramble(word, pg);
     return new WordPair(word, scrambledWord);
-  }
+  }*/
 
   /**
    * Gets the number of milliseconds the player has used in this

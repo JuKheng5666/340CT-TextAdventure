@@ -34,10 +34,9 @@ public class Puzzle extends JPanel {
 	 * if puzzle not paused, state = true
 	 * */
 	public static boolean state = true;
-	public static String userProgress = "Progress";
 	
 	//variable for checking whether puzzle is completed
-	public static boolean complete = false;
+	public static boolean complete;
 
 	/*
 	 * Parameterize methods
@@ -56,6 +55,8 @@ public class Puzzle extends JPanel {
 			//Pass the Segment the instance of the Game, its position (by the index) and its size
 			segments[i] = new Segment(this, i, segmentSize);
 		}
+		
+		complete = false;
 	}
 	
 	public void setState(boolean s){
@@ -65,14 +66,6 @@ public class Puzzle extends JPanel {
 	//check if puzzle is completed.. not used at all
 	public boolean isComplete(){
 		return complete;
-	}
-	
-	public void setUserProgress(String p){
-		userProgress = p;
-	}
-	
-	public String getUserProgress(){
-		return userProgress;
 	}
 	
 	/*

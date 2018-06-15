@@ -41,10 +41,9 @@ public class Main {
 
 	//function call falls here
 	public static boolean main(boolean puzzleSuccess) {
-		
-		puzzleComplete = puzzleSuccess;
+		puzzleComplete = false;
 
-		//a new JFrame have created with JFrame characteristic
+		//a new JFrame have created with JFrame properties
 		frame = new JFrame();
 		frame.setLayout(new BorderLayout());
 		frame.setTitle("Slider Puzzle");
@@ -94,6 +93,7 @@ public class Main {
 		JPanel puzzlePanel = new JPanel(new BorderLayout());
 		puzzle = new Puzzle(new ImageIcon(Main.class.getResource("/Images/images"+n+".jpg")).getImage());
 		setMouselistenerToPuzzle(puzzle);
+		
 		//set padding to move to center.. right and left padding 180
 		Border puzzleBorder = BorderFactory.createEmptyBorder(0, 180, 0, 180);
 		puzzlePanel.setBorder(puzzleBorder);
@@ -144,7 +144,6 @@ public class Main {
 		//close the whole frame when skip button is clicked
 		btnSkip.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				puzzle.setUserProgress("skipped");
 				//close frame
 				frame.dispose();
 			}
@@ -181,6 +180,7 @@ public class Main {
 
 		//call stop watch to start counting time
 		stopWatch watch = new stopWatch();
+		watch.resetClock();
 		watch.start(lblMilliseconds, lblSeconds, lblMinutes, lblHours);
 
 		timerPanel.add(lblTimer);
@@ -231,6 +231,8 @@ public class Main {
 		//setVisible is to allow the frame to be view by public
 		frame.setVisible(true);
 
+		//thread for checking whether the puzzle has been completed
+		//also used for checking whether the timer has passed 2 minutes
 		Thread t = new Thread(){
 			public void run(){
 				for (;;){
@@ -238,9 +240,10 @@ public class Main {
 					try{
 						sleep(10);
 
+						//if slider puzzle has been completed
+						//change button text to finish and stop the timer
 						if (puzzle.isComplete() == true){
 							puzzleComplete = true;
-							puzzle.setUserProgress("Completed");
 							btnSkip.setText("Finish");
 							btnSkip.setVisible(true);
 							watch.pause();
@@ -265,6 +268,14 @@ public class Main {
 		frame.setDefaultCloseOperation(frame.DISPOSE_ON_CLOSE);
 		
 		return puzzleComplete;
+	}
+	
+	//for checking whether puzzle has been completed
+	public static boolean getPuzzleStatus(){
+		if (puzzleComplete)
+			return true;
+		else
+			return false;
 	}
 
 	public static void setMouselistenerToPuzzle(Puzzle puzzle){
