@@ -1,18 +1,24 @@
 package WordScrambler;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.util.Random;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.border.Border;
 
 /**
  * User interface for ScrambledWordGame.  The UI uses a WordPair
@@ -138,12 +144,37 @@ public class WordGameUI extends JPanel
     scoreLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
     // panel for buttons and total score
-    JPanel buttonPanel = new JPanel();
+    JPanel btnGameInstructionPanel = new JPanel(new BorderLayout());
+    
+    JPanel buttonPanel = new JPanel(new FlowLayout());
     buttonPanel.add(startButton);
     buttonPanel.add(hintButton);
     buttonPanel.add(rescrambleButton);
     buttonPanel.add(submitButton);
     
+    btnGameInstructionPanel.add(buttonPanel, BorderLayout.NORTH);
+    
+    //add some game instructions
+	JPanel gameRules = new JPanel(new BorderLayout());
+	JLabel title = new JLabel("Game Instructions:");
+	title.setFont(new Font("Serif", Font.PLAIN, 20));
+	title.setHorizontalAlignment(SwingConstants.CENTER);
+	
+	JTextArea jtxtInfo = new JTextArea();
+	Border border = BorderFactory.createEmptyBorder(5,15,5,15);
+	jtxtInfo.setBorder(border);
+	jtxtInfo.setBackground(new Color(0,0,0,0));
+	jtxtInfo.setEditable(false);
+	jtxtInfo.setWrapStyleWord(true);
+	jtxtInfo.setLineWrap(true);
+	jtxtInfo.setHighlighter(null);
+	jtxtInfo.getCaret().deinstall(jtxtInfo);
+	jtxtInfo.setText("1. Click 'Start' to begin. \n2. Read the question provided and try to guess the answer with the provided alphabets. \n3. Try to form the correct answer by dragging the alphabets to the correct position. \n4. Click on 'Hint' if you need some help. Note that using hints will reduce your score. \n5. Click on 'Rescramble' if you want to randomly arrange the alphabets. Note that rescrambling will reduce your score. \n6. Click on 'Give up' to change the question. Note that you only have 3 chances. Otherwise, no points is rewarded. \n7. Click on 'Submit' if you think you have the right answer. Points will be rewarded for the correct answer. Note that points will be reduced if the answer is incorrect.");
+	gameRules.add(title, BorderLayout.NORTH);
+	gameRules.add(jtxtInfo, BorderLayout.CENTER);
+    
+	btnGameInstructionPanel.add(gameRules);
+	
     // Question
     questionLabel.setFont(new Font("Serif", Font.PLAIN, 24));
     questionLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -171,7 +202,7 @@ public class WordGameUI extends JPanel
     
     // score on top, buttons in middle, letters on bottom
     this.setLayout(new BorderLayout());
-    this.add(buttonPanel, BorderLayout.CENTER);
+    this.add(btnGameInstructionPanel, BorderLayout.CENTER);
     this.add(scoreLabel, BorderLayout.NORTH);
     this.add(wordPanel, BorderLayout.SOUTH);
   }
@@ -204,6 +235,7 @@ public class WordGameUI extends JPanel
       UIMain.setFrameStatus(true);
       
       UIMain.stopThread = true;
+      TextAdventure.Main.showWindow();
       UIMain.frame.dispose();
       //System.exit(0);
     }
@@ -229,6 +261,7 @@ public class WordGameUI extends JPanel
         
         //System.exit(0);
         UIMain.stopThread = true;
+        TextAdventure.Main.showWindow();
         UIMain.frame.dispose();
     }
   }
@@ -292,11 +325,12 @@ public class WordGameUI extends JPanel
     }
     catch (Exception e)  // possible FileNotFoundException
     {
-      String msg = "AAAException: " + e;
+      String msg = "Exception: " + e;
       JOptionPane.showMessageDialog(this.getParent(), msg);
       
       //System.exit(1);
       UIMain.stopThread = true;
+      TextAdventure.Main.showWindow();
       UIMain.frame.dispose();
     }
 
@@ -343,6 +377,7 @@ public class WordGameUI extends JPanel
         
         //System.exit(0);
         UIMain.stopThread = true;
+        TextAdventure.Main.showWindow();
         UIMain.frame.dispose();
       }
       else
@@ -383,6 +418,7 @@ public class WordGameUI extends JPanel
         JOptionPane.showMessageDialog(WordGameUI.this.getParent(), msg); 
         
         UIMain.stopThread = true;
+        TextAdventure.Main.showWindow();
         UIMain.frame.dispose();
         //System.exit(1);
       }

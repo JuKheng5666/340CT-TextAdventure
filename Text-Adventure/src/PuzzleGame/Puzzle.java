@@ -101,6 +101,7 @@ public class Puzzle extends JPanel {
 	Thread mix = new Thread(new Runnable() {
 		public void run() {
 			mixing = true;
+			
 			while (mixing == true) {
 				ArrayList<Integer> possibleMovements = new ArrayList<Integer>();
 				for (Segment s : segments) {

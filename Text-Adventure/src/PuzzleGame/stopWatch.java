@@ -86,4 +86,9 @@ public class stopWatch {
 	public int getMinutes(){
 		return minutes;
 	}
+	
+	//get the value for seconds (for checking whether 6 seconds has passed)
+	public int getSeconds(){
+		return seconds;
+	}
 }

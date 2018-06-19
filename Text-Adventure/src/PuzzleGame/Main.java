@@ -11,6 +11,7 @@ package PuzzleGame;
  * */
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -27,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
 public class Main {
@@ -36,8 +38,10 @@ public class Main {
 
 	//Puzzle class is used to define a puzzle characteristic and behavior
 	static Puzzle puzzle;
-	
+	static stopWatch watch;
 	static boolean puzzleComplete;
+	static int n;
+	static JLabel lblTimer, lblMilliseconds, lblSeconds, lblMinutes, lblHours;
 
 	//function call falls here
 	public static boolean main(boolean puzzleSuccess) {
@@ -50,19 +54,19 @@ public class Main {
 		frame.setUndecorated(true);
 
 		//the frame size has been fixed
-		frame.setSize(1250,800);
+		frame.setSize(1050,580);
 
 		//setLocationRelativeTo method is null to allocate the frame on the center of the system
 		frame.setLocationRelativeTo(null);
 
-		//This is to allow the user to Resize the frame 
+		//do not allow the user to Resize the frame 
 		frame.setResizable(false);
 
 		//Purpose of the random number is allow the system to randomly generate the image puzzle
 		Random rand = new Random();
 
 		//the 'n' is based on how many images available and choose the image within the numbers
-		int  n = rand.nextInt(3) + 1;
+		n = rand.nextInt(4) + 1;
 
 		//will contain every JComponent, contentPanel will be added into the frame later
 		JPanel contentPanel = new JPanel(new BorderLayout());
@@ -102,8 +106,7 @@ public class Main {
 		puzzlePanel.add(puzzle);
 
 		//panel to show actual image of the puzzle
-		JPanel actualPicPanel = new JPanel(new GridLayout(4,1));
-		JLabel lblImageText = new JLabel("Actual Image: ");	//just a text
+		JPanel actualPicPanel = new JPanel(new GridLayout(2,0));
 
 		//use label to show the image
 		JLabel lblImage = new JLabel();
@@ -112,26 +115,22 @@ public class Main {
 		img = img.getScaledInstance(180, 200, Image.SCALE_SMOOTH);
 		actualImg = new ImageIcon(img);
 		lblImage.setIcon(actualImg);
+		lblImage.setText("(Actual image)");
 
-		//label for writing info on the animal (optional)
-		JLabel lblInfo = new JLabel();
-		switch (n){
-		case 1:
-			lblInfo.setText("Cat");
-			break;
-		case 2:
-			lblInfo.setText("Orang Utan");
-			break;
-		case 3:
-			lblInfo.setText("Penguin");
-			break;
-		default:
-			lblInfo.setText("Animals");
-		}
+		//label for writing game instruction
+		JTextArea jTxtInfo = new JTextArea();
+		jTxtInfo.setSize(230, 800);
+		jTxtInfo.setLineWrap(true);
+		jTxtInfo.setWrapStyleWord(true);
+		jTxtInfo.setBackground(new Color(0,0,0,0));
+		jTxtInfo.getCaret().deinstall(jTxtInfo);
+		jTxtInfo.setHighlighter(null);
+		jTxtInfo.setEditable(false);
+		
+		jTxtInfo.setText("Game instructions: \n1. Click on the puzzle to start scrambling. \n2. Click again to stop scrambling. \n3. Start playing by moving a puzzle piece to the white space repeatedly to rearrange the image. Refer to the actual image for clues. \n4. Click on 'Reset Puzzle' if you want to start from the beginning again. \n5. You can move one puzzle piece at a time. Good Luck! \n6. Click 'Finish' button after completion.");
 
-		actualPicPanel.add(lblImageText);
 		actualPicPanel.add(lblImage);
-		actualPicPanel.add(lblInfo);
+		actualPicPanel.add(jTxtInfo);
 
 		puzzlePanel.add(actualPicPanel, BorderLayout.EAST);
 		
@@ -146,6 +145,7 @@ public class Main {
 			public void actionPerformed(ActionEvent e){
 				//close frame
 				frame.dispose();
+				TextAdventure.Main.showWindow();
 			}
 		});
 
@@ -171,17 +171,16 @@ public class Main {
 
 		//panel containing timer 
 		JPanel timerPanel = new JPanel (new FlowLayout());
-		JLabel lblTimer = new JLabel("TIMER: ");
-		JLabel lblMilliseconds = new JLabel("00 : ");
+		lblTimer = new JLabel("TIMER: ");
+		lblMilliseconds = new JLabel("0 : ");
 		lblMilliseconds.setVisible(false);
-		JLabel lblSeconds = new JLabel("00 : ");
-		JLabel lblMinutes = new JLabel("00 : ");
-		JLabel lblHours = new JLabel("00 ");
+		lblSeconds = new JLabel("0  ");
+		lblMinutes = new JLabel("0 : ");
+		lblHours = new JLabel("0: ");
 
 		//call stop watch to start counting time
-		stopWatch watch = new stopWatch();
+		watch = new stopWatch();
 		watch.resetClock();
-		watch.start(lblMilliseconds, lblSeconds, lblMinutes, lblHours);
 
 		timerPanel.add(lblTimer);
 		timerPanel.add(lblHours);
@@ -278,6 +277,30 @@ public class Main {
 			return false;
 	}
 
+	public static String getAnimal(){
+		String animal = "";
+		
+		switch (n){
+		case 1:
+			animal = "a rabbit";
+			break;
+		case 2:
+			animal = "an orang utan";
+			break;
+		case 3:
+			animal = "a fox";
+			break;
+		case 4:
+			animal = "a monkey";
+			break;
+		default:
+			animal = "a rabbit";
+			break;
+		}
+		
+		return animal;
+	}
+	
 	public static void setMouselistenerToPuzzle(Puzzle puzzle){
 		/*
 		 * addMouseListener is to enable the functionalities once it is clicked
@@ -290,6 +313,7 @@ public class Main {
 			public void mousePressed(MouseEvent e) {
 				if (!puzzle.started){
 					puzzle.start();
+					watch.start(lblMilliseconds, lblSeconds, lblMinutes, lblHours);
 				}
 				else if (puzzle.mixing){
 					puzzle.mixing = false;

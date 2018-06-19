@@ -14,18 +14,23 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import PuzzleGame.Puzzle;
+
 //Main class 
 public class Main {
 
 	//main text adventure UI elements
-	JFrame window, knowledgeWindow;
-	Container con, con2;
-	JPanel titleNamePanel, startButtonPanel, mainTextPanel, choiceButtonPanel, playerPanel, kchoiceButtonPanel, kBackPanel;
-	JLabel titleNameLabel, scoreLabel, scoreLabelNumber, weaponLabel, weaponLabelName, background;
+	static JFrame window;
+	static Container con;
+	JPanel titleNamePanel, startButtonPanel, choiceButtonPanel, playerPanel, kchoiceButtonPanel, kBackPanel;
+	static JPanel mainTextPanel;
+	JLabel titleNameLabel, scoreLabel;
+	static JLabel scoreLabelNumber, background;
 	Font titleFont = new Font("Times New Roman", Font.PLAIN, 70);
 	Font normalFont = new Font("Times New Roman", Font.PLAIN, 28);
-	JButton startButton, choice1, choice2, choice3, choice4, kChoice1, kChoice2, kChoice3, kChoice4, kChoice5, kChoice6, kReady, kBack;
-	JTextArea mainTextArea;
+	JButton startButton, kChoice1, kChoice2, kChoice3, kChoice4, kChoice5, kChoice6, kReady, kGameRules, kBack;
+	static JButton choice1, choice2, choice3;
+	static JTextArea mainTextArea;
 
 	//game variables
 	static int playerScore; 
@@ -33,8 +38,8 @@ public class Main {
 	//internal variables
 	static boolean puzzleSuccess;
 	static volatile boolean scramblerSuccess;
-	boolean lastPuzzle = false;
-	String position, randomGame;
+	static boolean lastPuzzle = false;
+	static String position, randomGame, animal;
 
 	//to be used for UI element background
 	Color semiTransparent = new Color(0,0,0,30);
@@ -187,6 +192,14 @@ public class Main {
 		kChoice6.setActionCommand("kc6");
 		kchoiceButtonPanel.add(kChoice6);
 
+		//Button for viewing game rules
+		kGameRules = new JButton("Knowledge Choice 8");
+		kGameRules.setFont(normalFont);
+		kGameRules.setFocusPainted(false);
+		kGameRules.addActionListener(choiceHandler);
+		kGameRules.setActionCommand("kRules");
+		kchoiceButtonPanel.add(kGameRules);
+		
 		//Button for user to click when they are ready to play the game
 		kReady = new JButton("Knowledge Choice 7");
 		kReady.setFont(normalFont);
@@ -248,18 +261,6 @@ public class Main {
 		choice3.addActionListener(choiceHandler);
 		choice3.setActionCommand("c3");
 		choiceButtonPanel.add(choice3);
-
-		/*
-		//Design button four -Choice 4
-		choice4 = new JButton("Choice 4");
-		//choice4.setBackground(Color.black);
-		//choice4.setForeground(Color.white);
-		choice4.setFont(normalFont);
-		choice4.setFocusPainted(false);
-		choice4.addActionListener(choiceHandler);
-		choice4.setActionCommand("c4");
-		choiceButtonPanel.add(choice4);
-		 */
 
 		//panel for user's game score
 		playerPanel = new JPanel();
@@ -323,6 +324,7 @@ public class Main {
 		kChoice4.setText("Parrot");
 		kChoice5.setText("Rabbit");
 		kChoice6.setText("Snake");
+		kGameRules.setText("Game Instruction");
 		kReady.setText("PLAY");
 
 		//usually do revalidate together with repaint
@@ -429,6 +431,24 @@ public class Main {
 		con.revalidate();
 		con.repaint();
 	}
+	
+	//Show game rules 
+	public void viewGameInstruction(){
+		//hide panels that are not required to be shown
+		kchoiceButtonPanel.setVisible(false);
+		mainTextPanel.setVisible(false);
+		choiceButtonPanel.setVisible(false);
+		playerPanel.setVisible(false);
+
+		//show back button for user to go back
+		kBackPanel.setVisible(true);
+
+		//show the learning info which is in image form
+		background.setIcon(new ImageIcon(Main.class.getResource("/Images/GameInstruction.jpg")));
+
+		con.revalidate();
+		con.repaint();
+	}
 
 	//first scenario (starting point of user in the game)
 	public void wildAnimal(){
@@ -502,13 +522,13 @@ public class Main {
 	}
 
 	//enter crossRoad() after puzzle solved / skipped
-	public void crossRoad(){
+	public static void crossRoad(){
 		position = "crossRoad";
 
 		background.setIcon(new ImageIcon(Main.class.getResource("/Images/You are lost.jpg")));
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("You take a look behind you.\n\n Sadly, it was just a wild rabbit and you ran away like a little girl.\n\nYou are now lost.\nChoose where you want to go");
+		mainTextArea.setText("You take a look behind you.\n\n Sadly, it was just " + PuzzleGame.Main.getAnimal() + " and you ran away like a little girl.\n\nYou are now lost.\nChoose where you want to go");
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
@@ -571,7 +591,7 @@ public class Main {
 		choice2.setText("Chase the monkey");
 		choice3.setText("");
 	}
-
+	
 	//choice: Chase the monkey
 	//let user choose what they want to do
 	public void chaseMonkey(){
@@ -597,13 +617,13 @@ public class Main {
 		background.setIcon(new ImageIcon(Main.class.getResource("/Images/Fruits garden.jpg")));
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("After a long time, you feel so thirsty due to the hot weather. \nYou are hungry and exhausted.\n\nYou trip and fall onto a stone accidentally.\nYou found a combitnation set of numbers on the stone.");
+		mainTextArea.setText("After a long time, you feel so thirsty due to the hot weather. \nYou are hungry and exhausted.\n\nYou trip and fall onto a stone accidentally.\nYou see a puzzle on the ground nearby. Solve it?");
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
 		con.repaint();
 
-		choice1.setText("Solve the code"); //play a puzzle game
+		choice1.setText("Solve the puzzle"); //play a puzzle game
 		choice2.setText("Walk away"); //will end up at the aWayOut() method
 		choice3.setText("");
 	}
@@ -616,7 +636,7 @@ public class Main {
 		background.setIcon(new ImageIcon(Main.class.getResource("/Images/guessParrot.jpg")));
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("A parrot sang a song.\n\nYou have to guess the title of the song in order to get the secret code.");//will discover secret code
+		mainTextArea.setText("A parrot sang a song.\n\nThe song sounded familiar. It then asks you to complete the song. \n\nAccept the challenge?");//will discover secret code
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
@@ -625,6 +645,25 @@ public class Main {
 		choice1.setText("Accept its challenge."); //play a puzzle game
 		choice2.setText("Walk away"); //will end up in the temple
 		choice3.setText("");
+	}
+	
+	//comes from completing puzzles in awayout() or findfruit()
+	//user chooses what they want to do
+	public static void crossRoad2(){
+		position = "crossRoad2";
+
+		background.setIcon(new ImageIcon(Main.class.getResource("/Images/You are lost.jpg")));
+
+		mainTextPanel.removeAll();
+		mainTextArea.setText("Somehow you ended up in another crossroad. \n\nYou are now lost.\nWhat do you want to do?");
+		mainTextPanel.add(mainTextArea);
+
+		con.revalidate();
+		con.repaint();
+
+		choice1.setText("Go west");	//brings user to the start of the jungle again (north())
+		choice2.setText("Go north"); //brings user to ruinTemple()
+		choice3.setText("Have a rest"); //brings user to sitAndRelax()
 	}
 
 	//choice: Just let it be (from west()) / Walk away (from aWayOut())
@@ -892,7 +931,7 @@ public class Main {
 		position = "tunnelGenie";
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("Feeling relieved that the trap was over, you look around the room when a mysterious genie suddenly appears and asks you to solve his question in return for a code to the ancient relic.");
+		mainTextArea.setText("Feeling relieved that the trap was over, you look around the room when a mysterious genie suddenly appears and asks you to solve a puzzle game in return for a path to the ancient relic.");
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
@@ -905,11 +944,11 @@ public class Main {
 
 	//comes from tunnelGenie()
 	//brings user to leftTunnelRelic()
-	public void tunnelGeniePuzzle(){
+	public static void tunnelGeniePuzzle(){
 		position = "tunnelGeniePuzzle";
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("The genie moves closer to you with great desperation in its eyes.\n\nYou could not ignore his pleas and decided to solve his question.");
+		mainTextArea.setText("The genie moves closer to you with great desperation in its eyes.\n\nYou could not ignore his pleas and decided to help him.");
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
@@ -1126,6 +1165,7 @@ public class Main {
 	}
 
 	//before showing puzzle game to user, show this
+	/*
 	public void askToSolve(){
 		position="askToSolve";
 
@@ -1139,7 +1179,7 @@ public class Main {
 		choice1.setText(">");
 		choice2.setText("");  
 		choice3.setText("");
-	}
+	}*/
 
 	//when user solved/skipped a puzzle game, show this
 	//for scenarios in the jungle
@@ -1160,12 +1200,12 @@ public class Main {
 
 	//when user solved/skipped a puzzle game, show this
 	//for scenarios inside the temple
-	public void trapSolve(){
+	public static void trapSolve(){
 		position="trapsolve";
 		lastPuzzle = true;
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("Congratulations, you solved the puzzle game.\n");
+		mainTextArea.setText("You solved the genie's question. \n\n In return, he guides you to the ancient relic.");
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
@@ -1215,7 +1255,7 @@ public class Main {
 		//get a random number between 0 (inclusive) and 1000
 		//the mod of the random number is obtained and stored in the seed variable
 		int seed = rand.nextInt(1000) % 2;
-
+		
 		//reset word scrambler puzzle game completion status
 		//false means not solved yet
 		WordScrambler.UIMain.setScramblerStatus(false);
@@ -1229,6 +1269,7 @@ public class Main {
 
 			//randomGame variable to set which game was chosen by the game randomizer
 			randomGame = "slider";
+			window.setVisible(false);
 			break;
 
 			//if seed is an odd number, word scrambler is shown
@@ -1236,12 +1277,13 @@ public class Main {
 			//store the completion status of the word scrambler puzzle game to scramberSuccess variable
 			scramblerSuccess = WordScrambler.UIMain.main(scramblerSuccess);
 			randomGame = "scrambler";
+			window.setVisible(false);
 			break;
 		}
 	}
 
 	//function used to check whether the puzzle game has been completed or skipped
-	public boolean checkPuzzleCompletion(){
+	public static boolean checkPuzzleCompletion(){
 		//boolean flag to store whether the puzzle game is completed or skipped
 		//false means skipped (give some penalty)
 		//true means completed (reward some points)
@@ -1269,6 +1311,13 @@ public class Main {
 			//if false, game was skipped, minus 100 points
 			else{
 				playerScore -= 100;
+				
+				//update score on screen
+				scoreLabelNumber.setText(String.valueOf(playerScore));
+
+				con.revalidate();
+				con.repaint();
+				
 				done = false;
 			}
 			break;
@@ -1301,20 +1350,31 @@ public class Main {
 
 		return done;
 	}
+	
+	//checks whether user's game is over or not
+	//true means game over
+	public static boolean scoreGameOver(){
+		boolean gameOver = false;
+		
+		if (playerScore < 0){
+			gameOver = true;
+		}
+		
+		return gameOver;
+	}
 
-	//got bo??
-	public void gameOver(){
+	public static void gameOver(){
 		position = "gameOver";
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("GAME OVERR!! \nYour score reached below 0. \n\nBetter luck next time!");
+		mainTextArea.setText("GAME OVER!! \n\nYour score reached below 0. \n\nBetter luck next time!");
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
 		con.repaint();
 
 		choice1.setText("Restart");
-		choice2.setText("");  
+		choice2.setText("End");  
 		choice3.setText("");
 	}
 
@@ -1342,6 +1402,14 @@ public class Main {
 				case "c3": west();break;
 				}
 				break;
+				
+			case "crossRoad2":
+				switch(yourChoice){
+				case "c1": north(); break;
+				case "c2": ruinTemple(); break;
+				case "c3": sitAndRelax(); break;
+				}
+				break;
 
 			case "north":
 				switch(yourChoice){
@@ -1365,17 +1433,14 @@ public class Main {
 			case "wildAnimal":
 				switch(yourChoice){
 				case "c1":
-					GameRandomizer();
 					Snake();
 					break;
 
 				case "c2":
-					GameRandomizer();
 					Tiger();
 					break;
 
 				case "c3":
-					GameRandomizer();
 					Monkey();
 					break;
 				}
@@ -1384,8 +1449,7 @@ public class Main {
 			case "snake":
 				switch(yourChoice){
 				case "c1": 
-					System.out.println(checkPuzzleCompletion());
-					crossRoad();
+					GameRandomizer();
 					break;
 				}
 				break;
@@ -1393,8 +1457,7 @@ public class Main {
 			case "tiger":
 				switch(yourChoice){
 				case "c1":
-					System.out.println(checkPuzzleCompletion());
-					crossRoad();
+					GameRandomizer();
 					break;
 				}
 				break;
@@ -1402,8 +1465,7 @@ public class Main {
 			case "monkey":
 				switch(yourChoice){
 				case "c1":
-					System.out.println(checkPuzzleCompletion());
-					crossRoad();
+					GameRandomizer();
 					break;
 				}
 				break;
@@ -1426,7 +1488,6 @@ public class Main {
 				switch(yourChoice){
 				case "c1":
 					GameRandomizer();
-					askToSolve();
 					break;
 
 				case "c2": aWayOut(); break;
@@ -1437,7 +1498,6 @@ public class Main {
 				switch(yourChoice){
 				case "c1":
 					GameRandomizer();
-					askToSolve();
 					break;
 
 				case "c2": sitAndRelax(); break;
@@ -1562,24 +1622,18 @@ public class Main {
 				break;
 
 			case "tunnelGeniePuzzle":
-				System.out.println(checkPuzzleCompletion());
-				switch (yourChoice){
-				case "c1": trapSolve(); break;
-				}
+				GameRandomizer();
 				break;
 
 			case "tunnelGenie":
 				switch (yourChoice){
 				case "c1":
-					GameRandomizer();
 					tunnelGeniePuzzle();
 					break;
 				case "c2":
-					GameRandomizer();
 					tunnelGeniePuzzle();
 					break;
 				case "c3":
-					GameRandomizer();
 					tunnelGeniePuzzle();
 					break;
 				}
@@ -1643,8 +1697,12 @@ public class Main {
 
 			case "codesolve":
 				System.out.println(checkPuzzleCompletion());
-				switch(yourChoice){
-				case "c1": crossRoad(); break;
+				if (scoreGameOver())
+					gameOver();
+				else{
+					switch(yourChoice){
+					case "c1": crossRoad(); break;
+					}	
 				}
 				break;
 
@@ -1668,17 +1726,34 @@ public class Main {
 			case "restart":
 				switch (yourChoice){
 				case "c1":
-					con.revalidate();
-					con.repaint();
 					puzzleSuccess = false;
 					scramblerSuccess = false;
+					playerScore = 0;
 					knowledgeBank();
+					con.revalidate();
+					con.repaint();
 					break;
 				case "c2":
 					//close the program
 					System.exit(0);
 					break;
 				}
+				break;
+			
+			case "gameOver":
+				switch(yourChoice){
+				case "c1":
+					puzzleSuccess = false;
+					scramblerSuccess = false;
+					playerScore = 0;
+					knowledgeBank();
+					con.revalidate();
+					con.repaint();
+					break;
+				case "c2":
+					System.exit(0);
+				}
+				break;
 
 			case "knowledge":
 				switch(yourChoice){
@@ -1721,6 +1796,10 @@ public class Main {
 				case "kr":
 					wildAnimal();
 					break;
+					
+				case "kRules":
+					viewGameInstruction();
+					break;
 
 				case "kBack":
 					knowledgeBank();
@@ -1738,4 +1817,29 @@ public class Main {
 		return playerScore;
 	}
 
+	public static void showWindow(){
+		System.out.println(checkPuzzleCompletion());
+		if (scoreGameOver())
+			gameOver();
+		else{
+			switch(position){
+			case "snake":
+			case "tiger":
+			case "monkey":
+				crossRoad();
+				break;
+				
+			case "findfruit":
+			case "awayout":
+				crossRoad2();
+				break;
+				
+			case "tunnelGeniePuzzle":
+				trapSolve();
+				break;
+			}
+		}
+		
+		window.setVisible(true);
+	}
 }//endMain

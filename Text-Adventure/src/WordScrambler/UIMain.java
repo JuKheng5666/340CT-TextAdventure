@@ -1,5 +1,8 @@
 package WordScrambler;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
@@ -7,8 +10,10 @@ import java.io.IOException;
 import java.util.Random;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 /**
@@ -83,7 +88,6 @@ public class UIMain
 		//used for programmatically closing the JFrame later
 		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 		frame.setUndecorated(true);
-		frame.setLocationRelativeTo(null);
 
 		try
 		{
@@ -99,13 +103,16 @@ public class UIMain
 			ScoreCalculator calc = new ScoreCalculator(5000, 5000, 100, 10);
 			Random rand = new Random(seed);
 			PermutationGenerator pg = new PermutationGenerator(rand);
-
+			
 			// construct the main game panel and add it to the frame
 			JPanel mainPanel = new WordGameUI(calc, questionList, answerList, rand, pg);
 			frame.getContentPane().add(mainPanel);
 
+			frame.getContentPane().revalidate();
+			frame.getContentPane().repaint();
+			
 			// size the frame based on the preferred size of the mainPanel
-			frame.pack();
+			frame.setPreferredSize(new Dimension(800, 360));
 
 			// make sure it closes when you click the close button on the window
 			frame.setDefaultCloseOperation(frame.DISPOSE_ON_CLOSE);
@@ -123,6 +130,8 @@ public class UIMain
 			stopThread = false;
 			new Thread(checkingThread).start();
 
+			frame.pack();
+			frame.setLocationRelativeTo(null);
 			frame.setVisible(true);
 		}
 		catch (FileNotFoundException e)
