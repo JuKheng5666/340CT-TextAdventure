@@ -931,7 +931,7 @@ public class Main {
 		position = "tunnelGenie";
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("Feeling relieved that the trap was over, you look around the room when a mysterious genie suddenly appears and asks you to solve a puzzle game in return for a path to the ancient relic.");
+		mainTextArea.setText("Feeling relieved that the trap was over, you look around the room when a cunning looking fox suddenly appears and asks you to solve a puzzle game in return for a path to the ancient relic.");
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
@@ -948,7 +948,7 @@ public class Main {
 		position = "tunnelGeniePuzzle";
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("The genie moves closer to you with great desperation in its eyes.\n\nYou could not ignore his pleas and decided to help him.");
+		mainTextArea.setText("The fox moves closer to you with great desperation in its eyes.\n\nYou could not ignore his pleas and decided to help him.");
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
@@ -1205,7 +1205,7 @@ public class Main {
 		lastPuzzle = true;
 
 		mainTextPanel.removeAll();
-		mainTextArea.setText("You solved the genie's question. \n\n In return, he guides you to the ancient relic.");
+		mainTextArea.setText("You solved the fox's question. \n\n In return, he guides you to the ancient relic.");
 		mainTextPanel.add(mainTextArea);
 
 		con.revalidate();
@@ -1810,7 +1810,7 @@ public class Main {
 	}//endChoiceHandler
 
 	public static void setPlayerScore(int score){
-		playerScore += score;
+		playerScore = score;
 	}
 
 	public static int getPlayerScore(){

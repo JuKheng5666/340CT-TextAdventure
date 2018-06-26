@@ -102,14 +102,7 @@ public class ScoreCalculator
    */
   public void applyRescramblePenalty(int attemptLeft)
   {
-		if (attemptLeft == 3)
-		{
-			maxScore--;
-		}
-		else if (attemptLeft == 2)
-			maxScore = maxScore - 2;
-		else if (attemptLeft == 1)
-			maxScore = maxScore - 4;
+	  maxScore--;
   }
 
   /**
